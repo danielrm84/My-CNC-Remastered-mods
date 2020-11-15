@@ -1,0 +1,17 @@
+{ 
+
+"name": "RA_color_mod", 
+
+"description": "new colors for campaign and skirmish", 
+
+"author": "Kerekupai-meru", 
+
+"load_order": 1, 
+
+"version_low": 2, 
+
+"version_high": 1, 
+
+"game_type": "RA" 
+
+}

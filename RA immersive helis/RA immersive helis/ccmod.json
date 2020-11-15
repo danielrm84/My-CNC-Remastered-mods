@@ -1,0 +1,17 @@
+{ 
+
+"name": "RA immersive helis", 
+
+"description": "helis explore terrain, stay idle in the air until commanded to land (using the L key)", 
+
+"author": "Kerekupai-meru", 
+
+"load_order": 1, 
+
+"version_low": 2, 
+
+"version_high": 1, 
+
+"game_type": "RA" 
+
+}

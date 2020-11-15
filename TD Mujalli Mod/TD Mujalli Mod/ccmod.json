@@ -1,0 +1,17 @@
+{ 
+
+"name": "TD Mujalli Mod", 
+
+"description": "TD AI + immersive helis mod", 
+
+"author": "Kerekupai and Siraito", 
+
+"load_order": 1, 
+
+"version_low": 2, 
+
+"version_high": 1, 
+
+"game_type": "TD" 
+
+}

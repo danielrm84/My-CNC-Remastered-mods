@@ -1,0 +1,17 @@
+{ 
+
+"name": "immersive_helis", 
+
+"description": "In this mod, helis explore terrain, stay idle in the air until commanded to land (using the key L for landing)", 
+
+"author": "Kerekupai-meru", 
+
+"load_order": 1, 
+
+"version_low": 2, 
+
+"version_high": 1, 
+
+"game_type": "TD" 
+
+}

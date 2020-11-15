@@ -1,0 +1,9 @@
+Hello!
+
+This is a small mod that modifies all Tiberian Dawn colors (except GDI gold) used for skirmish.
+
+I did this mod for myself, but decided to share it in case some of you would like it as well.
+
+Many thanks to Jozef for the great and useful guides and materials.
+
+Enjoy!
