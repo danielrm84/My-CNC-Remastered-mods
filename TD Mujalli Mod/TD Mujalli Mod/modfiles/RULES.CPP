@@ -87,18 +87,19 @@ DifficultyClass::DifficultyClass(void) :
  * HISTORY:                                                                                    *
  *   06/17/1996 JLB : Created.                                                                 *
  *=============================================================================================*/
-RulesClass::RulesClass(void) :
-	AttackInterval(2),//(3), Kerekupai
+/*RulesClass::RulesClass(void) :
+	
+	AttackInterval(2),//default (3), mod 2 Kerekupai
 	BaseSizeAdd(3),
-	PowerSurplus(100),//(50), Kerekupai
-	AttackDelay(2),//(5), Kerekupai
+	PowerSurplus(100),//default (50), mod 100 Kerekupai
+	AttackDelay(2),//default (5), mod 2 Kerekupai
 	PowerEmergencyFraction(0x00C0),
 	HelipadRatio(0x1E),
 	HelipadLimit(5),
 	AARatio(0x0024),
-	AALimit(5),//(10), Kerekupai
+	AALimit(5),//default (10), Kerekupai 5
 	DefenseRatio(0x0066),
-	DefenseLimit(10),//(40), Kerekupai
+	DefenseLimit(10),//default (40), Kerekupai 10
 	WarRatio(0x0019),
 	WarLimit(2),
 	BarracksRatio(0x0028),
@@ -116,11 +117,93 @@ RulesClass::RulesClass(void) :
 	IQScatter(3),
 	IQContentScan(4),
 	IQAircraft(4),
-	IQHarvester(4),//(2), Kerekupai
+	IQHarvester(2),//default (2), mod 4 Kerekupai
 	IQSellBack(2),//(mod 0), Kerekupai default 2
 	InfantryReserve(3000),
 	InfantryBaseMult(1),
 	IsComputerParanoid(true),
 	AllowSuperWeapons(true)
+	
 {
 }
+*/
+
+// Kerekupai: New RulesClass constructor
+RulesClass::RulesClass(void)
+{
+	if (GameToPlay != GAME_NORMAL) // if multiplayer
+	{
+		AttackInterval = 2;//default (3), mod 2 Kerekupai
+		BaseSizeAdd = 3;
+		PowerSurplus = 100;//default (50), mod 100 Kerekupai
+		AttackDelay = 2;//default (5), mod 2 Kerekupai
+		PowerEmergencyFraction = 0x00C0;
+		HelipadRatio = 0x1E;
+		HelipadLimit = 5;
+		AARatio = 0x0024;
+		AALimit = 5;//default (10), Kerekupai 5
+		DefenseRatio = 0x0066;
+		DefenseLimit = 10; //default (40), Kerekupai 10
+		WarRatio = 0x0019;
+		WarLimit = 2;
+		BarracksRatio = 0x0028;
+		BarracksLimit = 2;
+		RefineryLimit = 4;
+		RefineryRatio = 0x0028;
+		AirstripRatio = 0x001E;
+		AirstripLimit = 5;
+		MaxIQ = 5;
+		IQSuperWeapons = 4;
+		IQProduction = 5;
+		IQGuardArea = 4;
+		IQRepairSell = 1;
+		IQCrush = 2;
+		IQScatter = 3;
+		IQContentScan = 4;
+		IQAircraft = 4;
+		IQHarvester = 2;//default (2), mod 4 Kerekupai
+		IQSellBack = 2;//(mod 0), Kerekupai default 2
+		InfantryReserve = 3000;
+		InfantryBaseMult = 1;
+		IsComputerParanoid = true;
+		AllowSuperWeapons = true;
+	}
+	else { // campaign
+		AttackInterval = 3;//default (3), mod 2 Kerekupai
+		BaseSizeAdd = 3;
+		PowerSurplus = 50;//default (50), mod 100 Kerekupai
+		AttackDelay = 5;//default (5), mod 2 Kerekupai
+		PowerEmergencyFraction = 0x00C0;
+		HelipadRatio = 0x1E;
+		HelipadLimit = 5;
+		AARatio = 0x0024;
+		AALimit = 10;//default (10), Kerekupai 5
+		DefenseRatio = 0x0066;
+		DefenseLimit = 40; //default (40), Kerekupai 10
+		WarRatio = 0x0019;
+		WarLimit = 2;
+		BarracksRatio = 0x0028;
+		BarracksLimit = 2;
+		RefineryLimit = 4;
+		RefineryRatio = 0x0028;
+		AirstripRatio = 0x001E;
+		AirstripLimit = 5;
+		MaxIQ = 5;
+		IQSuperWeapons = 4;
+		IQProduction = 5;
+		IQGuardArea = 4;
+		IQRepairSell = 1;
+		IQCrush = 2;
+		IQScatter = 3;
+		IQContentScan = 4;
+		IQAircraft = 4;
+		IQHarvester = 2;//default (2), mod 4 Kerekupai
+		IQSellBack = 2;//(mod 0), Kerekupai default 2
+		InfantryReserve = 3000;
+		InfantryBaseMult = 1;
+		IsComputerParanoid = true;
+		AllowSuperWeapons = true;
+	}
+	
+}
+
