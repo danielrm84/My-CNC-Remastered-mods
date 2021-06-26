@@ -1400,6 +1400,7 @@ TARGET AircraftClass::check_Overlap(TARGET oldlz) const
 			}
 		}
 	}
+
 	return(oldlz);
 }
 
@@ -1725,6 +1726,22 @@ ResultType AircraftClass::Take_Damage(int & damage, int distance, WarheadType wa
  *=============================================================================================*/
 int AircraftClass::Mission_Move(void)
 {
+	// Kerekupai: if there are more than one human player in the session, then transport
+	// helis always land
+	int j = 0;
+	bool gaming_with_friends = false;
+	HousesType house;
+
+	if (GameToPlay != GAME_NORMAL)
+	{
+		for (int i = 0; i < MPlayerCount; i++) {
+			house = MPlayerHouses[i];
+			if (house && HouseClass::As_Pointer(house)->IsHuman) { j++; }
+		}
+	}
+	if (j > 1) { gaming_with_friends = true;  }
+	// Kerekupai: check if there is more than one human player
+
 	Validate();
 	if (Class->IsFixedWing) {
 
@@ -1851,10 +1868,7 @@ int AircraftClass::Mission_Move(void)
 					else
 					{
 						// kerekupai: check overlap with other helis
-						NavCom = this->check_Overlap(NavCom);
-
-						// update facing towards NavCom
-						SecondaryFacing.Set_Desired(Direction(NavCom)); 
+						NavCom = this->check_Overlap(NavCom); 
 
 						if (*this == AIRCRAFT_TRANSPORT && Is_LZ_Clear(NavCom))
 						{
@@ -1874,7 +1888,10 @@ int AircraftClass::Mission_Move(void)
 						// their cargo in single player missions
 						if ((IsALoaner &&  // is reinforcement
 							Is_LZ_Clear(NavCom) == true) ||	// landing zone clear
-							(GameToPlay == GAME_NORMAL && Scenario == 13 && Is_LZ_Clear(NavCom) == true)
+							// Kerekupai: AI always land transport helis
+							(*this == AIRCRAFT_TRANSPORT && !House->IsHuman) ||
+							//(GameToPlay == GAME_NORMAL && Scenario == 13 && Is_LZ_Clear(NavCom) == true) ||
+							(gaming_with_friends && Is_LZ_Clear(NavCom) == true && * this == AIRCRAFT_TRANSPORT)
 							)
 						{
 							Status = LAND;
@@ -2118,26 +2135,26 @@ void AircraftClass::Debug_Dump(MonoClass *mono) const
 	Validate();
 	mono->Set_Cursor(0, 0);
 	mono->Print(
-		"ÃšName:Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã‚Mission:Ã„Ã„Ã„Ã‚TarCom:Ã‚NavCom:Ã‚Radio:Ã‚Coord:Ã„Ã„Ã‚AltitudeÃ‚St:Ã„Â¿\n"
-		"Â³                   Â³           Â³       Â³       Â³      Â³        Â³        Â³    Â³\n"
-		"ÃƒÃ„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã‚NÃ‚YÃ‚Health:Ã„Ã‚Fdir:Ã‚Ã„Bdir:Ã„Ã‚Speed:Ã‚Ã„Ã„Ã„Ã„Ã„ÃÃ„Ã„Ã„Ã„Ã„Ã„Ã‚Cargo:Ã„Ã„Ã„Ã„ÃÃ„Ã„Ã„Ã„Â´\n"
-		"Â³Active........Â³ Â³ Â³        Â³     Â³       Â³      Â³            Â³               Â³\n"
-		"Â³Limbo.........Â³ Â³ ÃƒÃ„Ã„Ã„Ã„Ã„Ã„Ã„Ã„ÃÃ„Ã„Ã„Ã„Ã„ÃÃ„Ã„Ã„Ã„Ã„Ã„Ã„ÃÃ„Ã„Ã„Ã„Ã„Ã„ÃÃ„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„ÃÃ„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Â´\n"
-		"Â³Owned.........Â³ Â³ Â³Last Message:                                             Â³\n"
-		"Â³Discovered....Â³ Â³ ÃƒTimer:Ã‚Arm:Ã‚Ã„Ã„Ã„Ã„Ã„Ã„Ã‚Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã‚Flash:Ã‚Stage:Ã‚Team:Ã„Ã„Ã„Ã„Ã‚Arch:Â´\n"
-		"Â³Selected......Â³ Â³ Â³      Â³    Â³      Â³         Â³      Â³      Â³         Â³     Â³\n"
-		"Â³Teathered.....Â³ Â³ ÃƒÃ„Ã„Ã„Ã„Ã„Ã„ÃÃ„Ã„Ã„Ã„ÃÃ„Ã„Ã„Ã„Ã„Ã„ÃÃ„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„ÃÃ„Ã„Ã„Ã„Ã„Ã„ÃÃ„Ã„Ã„Ã„Ã„Ã„ÃÃ„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„ÃÃ„Ã„Ã„Ã„Ã„Ã™\n"
-		"Â³Locked on Map.Â³ Â³ Â³                                                           \n"
-		"Â³              Â³ Â³ Â³                                                           \n"
-		"Â³Is A Loaner...Â³ Â³ Â³                                                           \n"
-		"Â³Is Landing....Â³ Â³ Â³                                                           \n"
-		"Â³Is Taking Off.Â³ Â³ Â³                                                           \n"
-		"Â³              Â³ Â³ Â³                                                           \n"
-		"Â³              Â³ Â³ Â³                                                           \n"
-		"Â³              Â³ Â³ Â³                                                           \n"
-		"Â³Recoiling.....Â³ Â³ Â³                                                           \n"
-		"Â³To Display....Â³ Â³ Â³                                                           \n"
-		"Ã€Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„ÃÃ„ÃÃ„Ã™                                                           \n");
+		"ÚName:ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂMission:ÄÄÄÂTarCom:ÂNavCom:ÂRadio:ÂCoord:ÄÄÂAltitudeÂSt:Ä¿\n"
+		"³                   ³           ³       ³       ³      ³        ³        ³    ³\n"
+		"ÃÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂNÂYÂHealth:ÄÂFdir:ÂÄBdir:ÄÂSpeed:ÂÄÄÄÄÄÁÄÄÄÄÄÄÂCargo:ÄÄÄÄÁÄÄÄÄ´\n"
+		"³Active........³ ³ ³        ³     ³       ³      ³            ³               ³\n"
+		"³Limbo.........³ ³ ÃÄÄÄÄÄÄÄÄÁÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´\n"
+		"³Owned.........³ ³ ³Last Message:                                             ³\n"
+		"³Discovered....³ ³ ÃTimer:ÂArm:ÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÂFlash:ÂStage:ÂTeam:ÄÄÄÄÂArch:´\n"
+		"³Selected......³ ³ ³      ³    ³      ³         ³      ³      ³         ³     ³\n"
+		"³Teathered.....³ ³ ÃÄÄÄÄÄÄÁÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÙ\n"
+		"³Locked on Map.³ ³ ³                                                           \n"
+		"³              ³ ³ ³                                                           \n"
+		"³Is A Loaner...³ ³ ³                                                           \n"
+		"³Is Landing....³ ³ ³                                                           \n"
+		"³Is Taking Off.³ ³ ³                                                           \n"
+		"³              ³ ³ ³                                                           \n"
+		"³              ³ ³ ³                                                           \n"
+		"³              ³ ³ ³                                                           \n"
+		"³Recoiling.....³ ³ ³                                                           \n"
+		"³To Display....³ ³ ³                                                           \n"
+		"ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÁÄÙ                                                           \n");
 	mono->Set_Cursor(1, 1);mono->Printf("%s:%s", House->Class->IniName, Class->IniName);
 	mono->Set_Cursor(36, 3);mono->Printf("%02X:%02X", SecondaryFacing.Current(), SecondaryFacing.Desired());
 	mono->Set_Cursor(42, 1);mono->Printf("%04X", NavCom);
@@ -2798,8 +2815,11 @@ RadioMessageType AircraftClass::Receive_Message(RadioClass * from, RadioMessageT
 		/*
 		**	Asks if the passenger can load on this transport.
 		*/
+		// Kerekupai: allies can load on this transport
 		case RADIO_CAN_LOAD:
-			if (!In_Radio_Contact() && Class->IsTransporter && How_Many() < Class->Max_Passengers() && from && House->Class->House == from->Owner() && Altitude == 0) {
+			if (!In_Radio_Contact() && Class->IsTransporter && How_Many() < Class->Max_Passengers() && from && 
+				(House->Class->House == from->Owner() || House->Is_Ally(from->Owner())) && 
+				Altitude == 0) {
 				return(RADIO_ROGER);
 			}
 			return(RADIO_NEGATIVE);
