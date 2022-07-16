@@ -108,12 +108,6 @@ class AircraftClass : public FootClass, public FlyClass
 		TARGET New_LZ(TARGET oldlz) const;
 
 		/*
-		**  Check whether helicopter units overlap at given cell
-		**  Kerekupai
-		*/
-		TARGET check_Overlap(TARGET oldlz) const;
-
-		/*
 		**	Coordinate inquiry functions. These are used for both display and
 		**	combat purposes.
 		*/
@@ -163,6 +157,18 @@ class AircraftClass : public FootClass, public FlyClass
 		virtual void Enter_Idle_Mode(bool initial = false);
 		virtual RadioMessageType Receive_Message(RadioClass * from, RadioMessageType message, long & param);
 		virtual void Scatter(COORDINATE threat, bool forced=false, bool nokidding=false);
+
+		/* 
+		** Kerekupai: playing with friends?	
+		*/
+		bool gaming_with_friends;
+		short n_human_players;
+
+		/*
+		**  Check whether helicopter units overlap at given cell
+		**  Kerekupai
+		*/
+		TARGET check_overlap(TARGET oldlz) const;
 
 		/*
 		**	Scenario and debug support.
