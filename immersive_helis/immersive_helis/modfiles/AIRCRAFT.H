@@ -104,7 +104,13 @@ class AircraftClass : public FootClass, public FlyClass
 		**  Check whether helicopter units overlap at given cell
 		**  Kerekupai
 		*/
-		TARGET check_Overlap(TARGET oldlz) const;
+		TARGET check_overlap(TARGET oldlz) const;
+		
+		/*
+		** Kerekupai: playing with friends?
+		*/
+		bool gaming_with_friends;
+		short n_human_players;
 
 		/*
 		**	Coordinate inquiry functions. These are used for both display and
