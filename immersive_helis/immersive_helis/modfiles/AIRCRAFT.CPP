@@ -992,6 +992,20 @@ void AircraftClass::AI(void)
 #endif
 	}
 
+	/*
+	** Kerekupai: send AI innactive helis back to their helipad
+	*/
+	if (!Class->IsFixedWing && !House->IsHuman && Frame % 25 == 0 &&
+		Altitude > 0 && Get_Speed() == MPH_IMMOBILE && !Ammo)
+	{
+		BuildingClass * building = Find_Docking_Bay(STRUCT_HELIPAD, false);
+		if (building)
+			Assign_Destination(building->As_Target());
+	}
+	/*
+	** Kerekupai: send AI innactive helis back to their helipad
+	*/
+
 }
 
 
