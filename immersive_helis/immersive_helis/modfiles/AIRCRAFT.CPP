@@ -999,8 +999,8 @@ void AircraftClass::AI(void)
 		Altitude > 0 && Get_Speed() == MPH_IMMOBILE && !Ammo)
 	{
 		BuildingClass * building = Find_Docking_Bay(STRUCT_HELIPAD, false);
-		if (building)
-			Assign_Destination(building->As_Target());
+		if (building && Transmit_Message(RADIO_HELLO, building) == RADIO_ROGER)
+			Assign_Mission(MISSION_ENTER);
 	}
 	/*
 	** Kerekupai: send AI innactive helis back to their helipad
