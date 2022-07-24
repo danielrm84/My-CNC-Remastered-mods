@@ -995,15 +995,18 @@ void AircraftClass::AI(void)
 	/*
 	** Kerekupai: send innactive helis back to their helipad
 	*/
-	if (!Class->IsFixedWing && /*!House->IsHuman &&*/ Frame % 50 == 0 &&
+	if (!Class->IsFixedWing && /*!House->IsHuman &&*/ Frame % 100 == 0 &&
 		Altitude > 0 && Get_Speed() == MPH_IMMOBILE && !Ammo)
 	{
 		BuildingClass * building = Find_Docking_Bay(STRUCT_HELIPAD, false);
-		if (building && Transmit_Message(RADIO_HELLO, building) == RADIO_ROGER)
+		Assign_Destination(TARGET_NONE);
+		if (building && !building->In_Radio_Contact() && Transmit_Message(RADIO_HELLO, building) == RADIO_ROGER)
 		{
 			Assign_Destination(building->As_Target());
-			Assign_Mission(MISSION_MOVE);
-			Assign_Mission(MISSION_ENTER);
+			if (Target_Legal(NavCom))
+				Assign_Mission(MISSION_MOVE);
+			if (!building->Is_Something_Attached())
+				Assign_Mission(MISSION_ENTER);
 		}
 	}
 	/*
