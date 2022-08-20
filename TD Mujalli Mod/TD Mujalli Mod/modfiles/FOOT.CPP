@@ -75,6 +75,15 @@
 
 #include	"function.h"
 
+ /*
+ ** Kerekupai: get key input status
+ */
+ //Added for getting the input for special character keys from the client 
+ // - 6/26/2019 JAS 
+extern bool DLL_Export_Get_Input_Key_State(KeyNumType key);
+/*
+** Kerekupai: end of get key input status
+*/
 
 /***********************************************************************************************
  * FootClass::FootClass -- Default constructor for foot class objects.                         *
@@ -113,6 +122,12 @@ FootClass::FootClass(void) : Speed(0)
 		House->CurUnits++;
 	}
 	Group = -1;
+
+	/*
+	** Kerekupai: attack move
+	** initialization
+	*/
+	attack_move = false;
 }
 
 
@@ -554,10 +569,29 @@ int FootClass::Mission_Move(void)
 {
 	if (!Target_Legal(NavCom) && !IsDriving && MissionQueue == MISSION_NONE) {
 		Enter_Idle_Mode();
+		/*
+		** Kerekupai: attack move (initialization)
+		*/
+		attack_move = false;
 	}
 	if (!Target_Legal(TarCom) && !House->IsHuman) {
 		Target_Something_Nearby(THREAT_RANGE);
 	}
+
+	/*
+	** Kerekupai: attack move, main routine
+	*/
+	bool shiftdown = DLL_Export_Get_Input_Key_State(KN_LSHIFT);
+	if (shiftdown && !attack_move && House->IsHuman && Is_Owned_By_Player()) {
+		attack_move = true;
+	}
+	if (House->IsHuman && Is_Owned_By_Player() && !Target_Legal(TarCom) && attack_move) {
+		Target_Something_Nearby(THREAT_RANGE);
+	}
+	/*
+	** Kerekupai: attack move, main routine
+	*/
+
 	return(TICKS_PER_SECOND+3);
 }
 
@@ -686,12 +720,10 @@ int FootClass::Mission_Guard(void)
  *=============================================================================================*/
 int FootClass::Mission_Hunt(void)
 {
-	// Kerekupai: from MinorAIfixes
-	// #MinorAIFixes - Try to target something in range. "Threat Normal" isn't meant to be passed to that function.
-//	if (!Target_Something_Nearby(THREAT_NORMAL)) {
-	if (!Target_Something_Nearby_Hunt(THREAT_RANGE)) {
+	if (!Target_Something_Nearby(THREAT_NORMAL)) {
 		Random_Animate();
 	} else {
+
 			if ( // Kerekupai: technicians go back to work
 				((InfantryTypeClass const &)Class_Of()).Type == INFANTRY_C1 ||
 				((InfantryTypeClass const &)Class_Of()).Type == INFANTRY_C7
@@ -703,25 +735,42 @@ int FootClass::Mission_Hunt(void)
 				// Kerekupai: engineers go into action if the target is a building, otherwise
 				// they stay inactive
 				BuildingClass * obj = As_Building(TarCom);
-				if (obj) {
+				if (obj && obj->Can_Capture()) {
 					Assign_Destination(TarCom);
 					Assign_Mission(MISSION_CAPTURE);
 				} else {
 					Assign_Mission(MISSION_NONE);
 				}
 				
-			} else {
-				Approach_Target();
-
-				// Kerekupai: Commando Rambo mission sabotage to buildings
-				if (What_Am_I() == RTTI_INFANTRY && ((InfantryTypeClass const &)Class_Of()).Type == INFANTRY_RAMBO)
-				{
-					BuildingClass * obj = As_Building(TarCom);
-					if (obj) {
-						Assign_Destination(TarCom);
-						Assign_Mission(MISSION_SABOTAGE);
+			}// Kerekupai: Commando Rambo mission sabotage to buildings
+			else if (What_Am_I() == RTTI_INFANTRY && ((InfantryTypeClass const &)Class_Of()).Type == INFANTRY_RAMBO)
+			{
+				BuildingClass * obj = As_Building(TarCom);
+				if (obj && In_Range(TarCom) && !IsFiring){
+					Assign_Mission(MISSION_SABOTAGE);
+					Assign_Destination(TarCom);
+				}
+				else{
+					Approach_Target();
+				}
+			// Kerekupai: end of Commando Rambo mission sabotage to buildings
+			}
+			else {
+				/*
+				** Kerekupai: make sure rocket launcher tries to find targets in range
+				*/
+				if (What_Am_I() == RTTI_UNIT && *(UnitClass*)this == UNIT_MLRS) {
+					if ((Target_Legal(TarCom) && !In_Range(TarCom, 0))/* || !IsFiring*/) {
+						Approach_Target();
 					}
 				}
+				else {
+					Approach_Target();
+				}
+				/*
+				** Kerkeupai: make sure rocket launcher tries to find targets in range
+				*/
+				//Approach_Target();
 			}
 	}
 	return(TICKS_PER_SECOND+5);
@@ -935,87 +984,90 @@ void FootClass::Stun(void)
  *=============================================================================================*/
 void FootClass::Approach_Target(void)
 {
-	/*
-	**	Determine that if there is an existing target it is still legal
-	**	and within range.
-	*/
-	if (Target_Legal(TarCom)) {
 
 		/*
-		**	If the target is too far away then head toward it.
+		**	Determine that if there is an existing target it is still legal
+		**	and within range.
 		*/
-		int maxrange = MAX(Weapon_Range(0), Weapon_Range(1));
-
-		if (!Target_Legal(NavCom) && (!In_Range(TarCom) || !IsLocked)) {
-//		if (!Target_Legal(NavCom) && (Distance(TarCom) > maxrange || !IsLocked)) {
+		if (Target_Legal(TarCom)) {
 
 			/*
-			** If the object that we are attacking is a building adjust the units
-			** max range so that people can stand far away from the buildings and
-			** hit them.
+			**	If the target is too far away then head toward it.
 			*/
-			BuildingClass * obj = As_Building(TarCom);
-			if (obj) {
-				maxrange += ((obj->Class->Width() + obj->Class->Height()) * (0x100 / 4));
-			}
+			int maxrange = MAX(Weapon_Range(0), Weapon_Range(1));
 
-			/*
-			** Adjust the max range of an infantry unit for where he is standing
-			** in the room.
-			*/
-			maxrange -= 0x00B7;
-#ifdef OBSOLETE
-			if (What_Am_I() == RTTI_INFANTRY) {
-				maxrange -= 0x0111;
-			} else {
+			if (!Target_Legal(NavCom) && (!In_Range(TarCom) || !IsLocked)) {
+				//		if (!Target_Legal(NavCom) && (Distance(TarCom) > maxrange || !IsLocked)) {
+
+							/*
+							** If the object that we are attacking is a building adjust the units
+							** max range so that people can stand far away from the buildings and
+							** hit them.
+							*/
+				BuildingClass * obj = As_Building(TarCom);
+				if (obj) {
+					maxrange += ((obj->Class->Width() + obj->Class->Height()) * (0x100 / 4));
+				}
+
+				/*
+				** Adjust the max range of an infantry unit for where he is standing
+				** in the room.
+				*/
 				maxrange -= 0x00B7;
-			}
+#ifdef OBSOLETE
+				if (What_Am_I() == RTTI_INFANTRY) {
+					maxrange -= 0x0111;
+				}
+				else {
+					maxrange -= 0x00B7;
+				}
 #endif
-			maxrange = MAX(maxrange, 0);
+				maxrange = MAX(maxrange, 0);
 
-			COORDINATE tcoord = ::As_Coord(TarCom);
-			COORDINATE trycoord = 0;
-			CELL tcell = Coord_Cell(tcoord);
-			CELL trycell = tcell;
-			DirType dir = Direction256(tcoord, Center_Coord());
-			bool found = false;
+				COORDINATE tcoord = ::As_Coord(TarCom);
+				COORDINATE trycoord = 0;
+				CELL tcell = Coord_Cell(tcoord);
+				CELL trycell = tcell;
+				DirType dir = Direction256(tcoord, Center_Coord());
+				bool found = false;
 
-			/*
-			**	Sweep through the cells between the target and the unit, looking for
-			**	a cell that the unit can enter but which is also within weapon range
-			**	of the target. If after a reasonable search, no appropriate cell could
-			**	be found, then the target will be assigned as the movement destination
-			**	and let "the chips fall where they may."
-			*/
-			for (int range = maxrange; range > 0x0080; range -= 0x0100) {
-				static int _angles[] = {0, 8, -8, 16, -16, 24, -24, 32, -32, 48, -48, 64, -64};
+				/*
+				**	Sweep through the cells between the target and the unit, looking for
+				**	a cell that the unit can enter but which is also within weapon range
+				**	of the target. If after a reasonable search, no appropriate cell could
+				**	be found, then the target will be assigned as the movement destination
+				**	and let "the chips fall where they may."
+				*/
+				for (int range = maxrange; range > 0x0080; range -= 0x0100) {
+					static int _angles[] = { 0, 8, -8, 16, -16, 24, -24, 32, -32, 48, -48, 64, -64 };
 
-				for (int index = 0; index < (sizeof(_angles)/sizeof(_angles[0])); index++) {
-					trycoord = Coord_Move(tcoord, (DirType)(dir + _angles[index]), range);
+					for (int index = 0; index < (sizeof(_angles) / sizeof(_angles[0])); index++) {
+						trycoord = Coord_Move(tcoord, (DirType)(dir + _angles[index]), range);
 
-					if (::Distance(trycoord, tcoord) < range) {
-						trycell = Coord_Cell(trycoord);
-						if (Can_Enter_Cell(trycell) <= MOVE_CLOAK && Map.In_Radar(trycell)) {
-							found = true;
-							break;
+						if (::Distance(trycoord, tcoord) < range) {
+							trycell = Coord_Cell(trycoord);
+							if (Can_Enter_Cell(trycell) <= MOVE_CLOAK && Map.In_Radar(trycell)) {
+								found = true;
+								break;
+							}
 						}
 					}
+					if (found) break;
 				}
-				if (found) break;
-			}
 
-			/*
-			**	If a suitable intermediate location was found, then head toward it.
-			**	Otherwise, head toward the enemy unit directly.
-			**	Infantry always head towards the target since they can enter a cell
-			**	in range, but still not be able to hit the target if the spot is out of range.
-			*/
-			if (found && What_Am_I() != RTTI_INFANTRY) {
-				Assign_Destination(::As_Target(trycell));
-			} else {
-				Assign_Destination(TarCom);
+				/*
+				**	If a suitable intermediate location was found, then head toward it.
+				**	Otherwise, head toward the enemy unit directly.
+				**	Infantry always head towards the target since they can enter a cell
+				**	in range, but still not be able to hit the target if the spot is out of range.
+				*/
+				if (found && What_Am_I() != RTTI_INFANTRY) {
+					Assign_Destination(::As_Target(trycell));
+				}
+				else {
+					Assign_Destination(TarCom);
+				}
 			}
-		}
 	}
 }
 
@@ -1040,6 +1092,45 @@ void FootClass::Approach_Target(void)
  *=============================================================================================*/
 int FootClass::Mission_Guard_Area(void)
 {
+	/*
+	** Kerekupai: transport vehicles / aircraft load up infantry units (as for RA)
+	*/
+	if (What_Am_I() == RTTI_AIRCRAFT && *((AircraftClass *)this) == AIRCRAFT_TRANSPORT &&
+		GameToPlay != GAME_NORMAL && ((AircraftClass *)this)->Altitude == 0){
+		if (!In_Radio_Contact() &&
+			House->Which_Zone(this) != ZONE_NONE &&
+			!House->IsHuman) {
+
+			int needed = ((AircraftClass *)this)->Class->Max_Passengers() - How_Many();
+
+			for (int index = 0; index < Infantry.Count(); index++) {
+				if (needed == 0) break;
+
+				InfantryClass * infantry = Infantry.Ptr(index);
+
+				if (infantry != NULL &&
+					infantry->IsActive &&
+					!infantry->IsInLimbo &&
+					infantry->Strength > 0 &&
+					infantry->House == House &&
+					!Target_Legal(infantry->TarCom) &&
+					!Target_Legal(infantry->NavCom) &&
+					Distance(infantry) < 7 * CELL_LEPTON_W &&
+					(infantry->Mission == MISSION_GUARD || infantry->Mission == MISSION_GUARD_AREA)) {
+
+					infantry->Assign_Mission(MISSION_ENTER);
+					infantry->ArchiveTarget = As_Target();
+					needed--;
+				}
+			}
+		}
+	}
+	/*
+	** Kerekupai: end of transport vehicles / aircraft load up infantry units (as for RA)
+	*/
+
+
+
 	if (What_Am_I() == RTTI_UNIT && ((UnitClass *)this)->Class->IsToHarvest) {
 		Assign_Mission(MISSION_HARVEST);
 		return(1+Random_Pick(1, 10));
@@ -1086,6 +1177,44 @@ int FootClass::Mission_Guard_Area(void)
 	} else {
 		Approach_Target();
 	}
+
+	/*
+	** Kerekupai: transport vehicles load up infantry units (as for RA)
+	*/
+	if (What_Am_I() == RTTI_UNIT && ((UnitClass *)this)->Class->IsTransporter){
+		if(!Target_Legal(TarCom) &&
+			!In_Radio_Contact() &&
+			House->Which_Zone(this) != ZONE_NONE &&
+			!House->IsHuman) {
+
+			int needed = ((UnitClass *)this)->Class->Max_Passengers() - How_Many();
+				
+			for (int index = 0; index < Infantry.Count(); index++) {
+				if (needed == 0) break;
+
+				InfantryClass * infantry = Infantry.Ptr(index);
+
+				if (infantry != NULL &&
+					infantry->IsActive &&
+					!infantry->IsInLimbo &&
+					infantry->Strength > 0 &&
+					infantry->House == House &&
+					!Target_Legal(infantry->TarCom) &&
+					!Target_Legal(infantry->NavCom) &&
+					Distance(infantry) < 7 * CELL_LEPTON_W &&
+					(infantry->Mission == MISSION_GUARD || infantry->Mission == MISSION_GUARD_AREA)) {
+
+					infantry->Assign_Mission(MISSION_ENTER);
+					infantry->ArchiveTarget = As_Target();
+					needed--;
+				}
+			}
+		}
+	}
+	/*
+	** Kerekupai: end of transport vehicles load up infantry units (as for RA)
+	*/
+
 	return(TICKS_PER_SECOND+Random_Picky((int)0, (int)4, (char*)NULL, (int)0));
 }
 

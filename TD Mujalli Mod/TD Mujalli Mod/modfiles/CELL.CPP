@@ -2220,6 +2220,7 @@ bool CellClass::Goodie_Check(FootClass * object, bool check_steel)
 							INFANTRY_RAMBO
 						};
 						InfantryTypeClass::As_Reference(_inf[Random_Pick((unsigned)0, sizeof(_inf)/sizeof(_inf[0])-1)]).Create_And_Place(Cell_Number(), object->Owner());
+						
 					}
 					return(false);
 

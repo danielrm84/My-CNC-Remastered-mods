@@ -690,6 +690,11 @@ extern "C" __declspec(dllexport) bool __cdecl CNC_Set_Multiplayer_Data(int scena
 		strncpy(MPlayerNames[i], player_info.Name, MPLAYER_NAME_MAX);
 		MPlayerNames[i][MPLAYER_NAME_MAX - 1] = 0;			// Make sure it's terminated
 
+		// Kerekupai: finding ai diff
+		CCDebugString("Player info: ");
+		CCDebugString((char*)player_info.Name);
+		CCDebugString("\n");
+
 		MPlayerID[i] = Build_MPlayerID(player_info.ColorIndex, (HousesType)player_info.House);
 
 		DLLExportClass::GlyphxPlayerIDs[i] = player_info.GlyphxPlayerID;

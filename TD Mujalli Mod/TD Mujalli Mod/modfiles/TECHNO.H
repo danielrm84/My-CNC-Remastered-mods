@@ -189,6 +189,18 @@ class TechnoClass :	public RadioClass,
 		int Ammo;
 
 		/*
+		** Kerekupai: unit gain veterancy
+		*/ 
+		double Armor_levup;
+		double Fpower_levup;
+		double ROF_levup; // rate of fire
+		int array_vet_icons[5]; // five levels; keep track which icon to draw: 1:rof; 2:armor; 3: fpower
+		int veterancy_level;
+		/*
+		** Kerekupai: end of unit gain veterancy
+		*/
+
+		/*
 		**	Used by the Obelisk laser to cache its laser weapon rendering data.
 		**  Line data is cleared after the specified delay.
 		**  Each line consists of: x, y, x1, y1, color, frame (max frame used to determine duration)
@@ -266,7 +278,6 @@ class TechnoClass :	public RadioClass,
 		void  Kill_Cargo(TechnoClass * source);
 		virtual void Record_The_Kill(TechnoClass * source);
 		virtual bool Target_Something_Nearby(ThreatType threat=THREAT_NORMAL);
-		virtual bool Target_Something_Nearby_Hunt(ThreatType threat = THREAT_NORMAL);
 		virtual void Stun(void);
 		virtual bool In_Range(COORDINATE coord, int which=0) const;
 		virtual bool In_Range(TARGET target, int which=0, bool reciprocal_check = true) const;

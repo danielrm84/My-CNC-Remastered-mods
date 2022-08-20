@@ -105,9 +105,6 @@
 #include "SidebarGlyphx.h"
 #include "defines.h"
 
-//#include	<regex> // kerekupai match string char pattern difficulty level
-//std::regex_match("subject", std::regex("(sub)(.*)"))
-
 
 /***********************************************************************************************
  * HouseClass::Validate -- validates house pointer															  *
@@ -218,6 +215,7 @@ void HouseClass::One_Time(void)
 	** Required for Red Alert AI. ST - 7/23/2019 3:21PM
 	*/
 	BuildChoice.Set_Heap(STRUCT_COUNT);
+
 #endif
 }
 
@@ -242,7 +240,7 @@ void HouseClass::One_Time(void)
 DiffType HouseClass::Assign_Handicap(DiffType handicap)
 {
 	DiffType old = Difficulty;
-	Difficulty = handicap; // kerekupai commented out
+	Difficulty = handicap;
 
 	if (GameToPlay != GAME_NORMAL) {
 		HouseTypeClass const * hptr = &HouseTypeClass::As_Reference(ActLike);
@@ -379,6 +377,9 @@ HouseClass::HouseClass(HousesType house) :
 	Blockage = 0;
 	UnitsLost = 0;
 	BuildingsLost = 0;
+
+	// Kerekupai: superweapon launched? initialization -> false
+	superweapon_launched = false;
 
 	NewActiveBScan = 0;
 	ActiveBScan = 0;
@@ -522,7 +523,7 @@ HouseClass::HouseClass(HousesType house) :
 	OldBScan = 0;
 
 	Assign_Handicap(DIFF_NORMAL);
-
+	
 #endif
 
 }
@@ -765,6 +766,7 @@ bool HouseClass::Can_Build(TechnoTypeClass const * type, HousesType house) const
 bool HouseClass::Can_Build(StructType s, HousesType house) const
 {
 	Validate();
+
 	return(Can_Build(&BuildingTypeClass::As_Reference(s), house));
 }
 
@@ -945,6 +947,8 @@ void HouseClass::AI(void)
 		IsStarted = true;
 		IsAlerted = true;
 	}
+
+
 #endif
 
 	/*
@@ -1346,6 +1350,7 @@ void HouseClass::AI(void)
 			**	Process the nuke strike AI and if something changed that would affect
 			**	the sidebar, then flag the sidebar to be redrawn.
 			*/
+			
 			if (NukeStrike.AI(this == PlayerPtr)) {
 				if (this == PlayerPtr) Map.Column[1].Flag_To_Redraw();
 			}
@@ -1354,29 +1359,37 @@ void HouseClass::AI(void)
 		/*
 		**	The computer may decide to fire the nuclear missile if it is ready.
 		*/
-		if (NukeStrike.Is_Ready() && !IsHuman) {
-			Special_Weapon_AI(SPC_NUCLEAR_BOMB);
+		/*
+		** Kerekupai: if campaign AI can use the nuke only once
+		*/ 
+		if ((GameToPlay == GAME_NORMAL && superweapon_launched == false) || GameToPlay != GAME_NORMAL)
+		{
+			if (NukeStrike.Is_Ready() && !IsHuman) {
+				Special_Weapon_AI(SPC_NUCLEAR_BOMB);
+				superweapon_launched = true;
+			}
 		}
 
 	} else {
-
+		/*
+		** Kerekupai: AI nuke enabled in skirmish / one time event in single player
+		*/ 
 		/*
 		**	If there is no nuke strike present, but there is a Temple of Nod
 		**	available, then make the nuke strike strike available.
 		*/
-		// Kerekupai: AI can use nuke
-		if ((GameToPlay == GAME_NORMAL || Rule.AllowSuperWeapons) && 
-			(ActiveBScan & STRUCTF_TEMPLE) && 
-			Has_Nuke_Device()
-			//&& IsHuman
-			) {
-		/*if ((GameToPlay == GAME_NORMAL || Rule.AllowSuperWeapons) &&
+		//((GameToPlay == GAME_NORMAL || Rule.AllowSuperWeapons) && (ActiveBScan & STRUCTF_TEMPLE) && Has_Nuke_Device() && IsHuman)
+		if ((GameToPlay == GAME_NORMAL || Rule.AllowSuperWeapons) &&
 			(ActiveBScan & STRUCTF_TEMPLE) &&
 			(ActLike == HOUSE_BAD || GameToPlay != GAME_NORMAL) &&
-			(IsHuman || GameToPlay != GAME_NORMAL)){*/
-
-			//NukeStrike.Enable((GameToPlay == GAME_NORMAL), this == PlayerPtr);
-			NukeStrike.Enable(false, this == PlayerPtr, Power_Fraction() < 0x0100);
+			(IsHuman || GameToPlay != GAME_NORMAL))
+		{
+			
+			NukeStrike.Enable((GameToPlay == GAME_NORMAL), this == PlayerPtr);
+	
+		/*
+		** Kerekupai: end of AI nuke enabled in skirmish / one time event in single player
+		*/ 
 
 			/*
 			**	Flag the sidebar to be redrawn if necessary.
@@ -1615,12 +1628,27 @@ void HouseClass::AI(void)
 			Do_All_To_Hunt();
 		}
 
+		/*
+		** Kerekupai: if this is the end of a Skirmish match
+		**			  AI uncloaks everything
+		**			  AI units can get invisible through crates
+		*/
+		if (GameToPlay != GAME_NORMAL && State == STATE_ENDGAME && !IsHuman  && Buildings.Count() < 1)
+		{
+			Do_Uncloak_All();
+		}
+		/*
+		** Kerekupai: end of AI uncloaks everything
+		*/
+
 		AI_Building();
 		AI_Unit();
 		AI_Vessel();
 		AI_Infantry();
 		AI_Aircraft();
-		// Kerekupai from #MinorAIFixes - call the Harvester unsticking code	
+		/*
+		** Kerekupai from #MinorAIFixes - call the Harvester unsticking code
+		*/ 	
 		AI_Harvesters();
 	}
 #endif
@@ -1661,14 +1689,19 @@ void HouseClass::AI(void)
 				if (PlayerPtr == building->House) {
 					building->Update_Buildables();
 
-					// Kerekupai: AI can repair damaged buildings
+					/*
+					** Kerekupai: AI can repair damaged buildings
+					*/ 
 					if (GameToPlay != GAME_NORMAL &&
 						!IsHuman &&
 						building->Strength < (building->Class_Of().MaxStrength * 0.85) &&
-						this->Available_Money() > 0)
+						Can_Make_Money())
 					{
 						building->Repair(1);
-					}// kerekupai: end of AI repairs
+					}
+					/*
+					** kerekupai: end of AI repairs
+					*/ 
 				}
 				
 
@@ -1678,15 +1711,16 @@ void HouseClass::AI(void)
 		Recalculate_Placement_Distances();
 	}
 	
-	// Kerekupai: sell structures to get money if there is no other way to get cash
+	/*
+	** Kerekupai: sell structures to get money if there is no other way to get cash
+	*/ 
 	bool sold = false;
 	if (GameToPlay != GAME_NORMAL &&
 		!IsHuman &&
-		this->Available_Money() < 5 && // insuficient funds
+		this->Available_Money() < 7 && // insuficient funds
 		Frame % 100 == 0 &&
 		(!(ActiveBScan & STRUCTF_REFINERY) ||
-		 !(UScan & UNITF_HARVESTER)))// &&
-			 //(Frame % 33) == 0)
+		 !(UScan & UNITF_HARVESTER)))
 	{
 		sold = Sell_Some_Structures();
 	}
@@ -1758,42 +1792,27 @@ void HouseClass::Harvested(unsigned tiberium)
 {
 	Validate();
 	long oldtib = Tiberium;
-	
-	/* Kerekupai: AI gain more tiberium on normal and hard difficulties             */
-	bool AI_cheats = false;
-	if (GameToPlay != GAME_NORMAL && // if multiplayer (not campaing)
-		!this->IsHuman &&
-		//PlayerPtr->Difficulty
-		Difficulty != DIFF_EASY) // if not easy difficulty
+
+	/*
+	** Kerekupai: AI get x2 more tiberium
+	*/
+	int f = 1;
+	if (GameToPlay != GAME_NORMAL && !IsHuman)
 	{
-		AI_cheats = true;
+		f = 2;
 	}
 
-	if (AI_cheats == true)
-	{
-
-		// lets AI cheat
-		if(Difficulty == DIFF_NORMAL)
-		{
-			Tiberium += tiberium * 3;
-		}
-
-		else if (Difficulty == DIFF_HARD)
-		{
-			Tiberium += tiberium * 6;
-		}
-	}
-	else {
-		Tiberium += tiberium;
-	}
-	/* Kerekupai: end of tiberium advantage                     */
-
-	//Tiberium += tiberium;
+	//Tiberium += tiberium; // original code
+	Tiberium += tiberium * f;
 	if (Tiberium > Capacity) {
 		Tiberium = Capacity;
 		IsMaxedOut = true;
 	}
-	HarvestedCredits += tiberium;
+	//HarvestedCredits += tiberium; // original code
+	HarvestedCredits += tiberium * f;
+	/*
+	** Kerekupai: end of AI get x2 more tiberium
+	*/
 	Silo_Redraw_Check(oldtib, Capacity);
 }
 
@@ -2786,7 +2805,7 @@ bool HouseClass::Place_Special_Blast(SpecialWeaponType id, CELL cell)
 					BuildingClass * b = Buildings.Ptr(index);
 					if (b && !b->IsInLimbo && b->House == this && *b == STRUCT_TEMPLE) {
 						launchsite = b;
-						break; // kerekupai: AI Nuke
+						break;
 					}
 				}
 
@@ -5282,7 +5301,9 @@ COORDINATE HouseClass::Find_Build_Location(BuildingClass * building) const
 		}
 	}
 
-	// Kerekupai: from #MinorAIFixes - 
+	/*
+	** Kerekupai: from #MinorAIFixes -
+	*/  
 	// If the building is a Refinery, try to place it in the base Zone nearest Tiberium
 	CELL zcell;
 
@@ -5311,7 +5332,9 @@ COORDINATE HouseClass::Find_Build_Location(BuildingClass * building) const
 		zcell = Find_Cell_In_Zone(building, tryzone);
 		if (zcell) return(zcell);
 	}
-	// Kerekupai: end of MinorAIFixes
+	/*
+	** Kerekupai: end of MinorAIFixes
+	*/ 
 
 	return(NULL);
 }
@@ -5596,37 +5619,35 @@ int HouseClass::Expert_AI(void)
 			maxvessel /= enemycount;
 			maxaircraft /= enemycount;
 		}
-
-		/* Kerekupai: differentially scale the number of units/buildings
-		** according to the difficulty level                            */
-		unsigned int building_scale = 25;
-		unsigned int inf_scale = 8;
-		unsigned int unit_scale = 20;
+		/*
+		** Kerekupai: scale up building, unit, infantry limit
+		**			  original default value = 10
+		*/
+		unsigned int building_scale = 10;
+		unsigned int inf_scale = 10;
+		unsigned int unit_scale = 10;
 		unsigned int air_scale = 10;
 
-		if (!IsHuman && // if AI
-			!(GameToPlay == GAME_NORMAL)) // if multiplayer
+		if (GameToPlay != GAME_NORMAL) 
 		{
-			switch (Difficulty) {
+			/*switch (Difficulty) {
 			case DIFF_EASY:
 				unit_scale *= 1;
 				building_scale *= 2;
 				inf_scale *= 2; //1
 				break;
-			case DIFF_NORMAL:
-				unit_scale *= 5; // mod 3
-				building_scale *= 2; // mod 3
+			case DIFF_NORMAL:*/
+				unit_scale *= 10; // mod 3 //
+				building_scale *= 3; // mod 3
 				inf_scale *= 5; // mod 4
-				break;
+			/*	break;
 			case DIFF_HARD:
 				unit_scale *= 12;
-				building_scale *= 6;
-				inf_scale *= 6;
+				building_scale *= 5;
+				inf_scale *= 7;
 				break;
-			}
+			}*/
 		}
-
-		/* Kerekupai: end of scaling                                       */
 
 		if (Control.MaxBuilding < (unsigned)maxbuilding + building_scale) {
 			Control.MaxBuilding = maxbuilding + building_scale;
@@ -5643,6 +5664,10 @@ int HouseClass::Expert_AI(void)
 		if (Control.MaxAircraft < (unsigned)maxaircraft + air_scale) {
 			Control.MaxAircraft = maxaircraft + air_scale;
 		}
+		/*
+		** Kerekupai: end of scale up building, unit, infantry limit
+		**			  original default value = 10
+		*/
 	}
 
 	/*
@@ -5865,6 +5890,18 @@ UrgencyType HouseClass::Check_Attack(void) const
 		}
 		return(URGENCY_CRITICAL);
 	}
+
+	/*
+	** Kerekupai: if density is high and not under attack then go attacking
+	*/
+	if (IsBaseBuilding && State != STATE_ATTACKED && CurInfantry + CurUnits > 50 && Percent_Chance(10))
+		return(URGENCY_CRITICAL);
+	/*
+	** Kerekupai: end of if density is high and not under attack then go attacking
+	*/
+
+
+
 	return(URGENCY_NONE);
 }
 
@@ -5972,130 +6009,149 @@ UrgencyType HouseClass::Check_Raise_Power(void) const
 bool HouseClass::AI_Attack(UrgencyType )
 {
 	//assert(Houses.ID(this) == ID);
-	/*
-	**	#MinorAIFixes - If we've just Rallied units, then don't shuffle.
-	**	Otherwise, don't both with shuffle if we have no Buildings OR on a 50% chance.
-	*/
 
-	bool shuffle = false;
-	if (rallystatus != SKIRMISH_RALLIED) {
-		shuffle = !((Frame > TICKS_PER_MINUTE && !CurBuildings) || Percent_Chance(50));
-	}
-
-	//	bool shuffle = !((Frame > TICKS_PER_MINUTE && !CurBuildings) || Percent_Chance(33));
+	bool shuffle = !((Frame > TICKS_PER_MINUTE && !CurBuildings) || Percent_Chance(33));
 	bool forced = (CurBuildings == 0);
-	CELL rallypoint;
-
-	if (Enemy == HOUSE_GOOD && CurUnits > 0) { CCDebugString("AI_Attack - Enemy is HOUSE_GOOD \n"); }
-	if (Enemy == HOUSE_BAD && CurUnits > 0) { CCDebugString("AI_Attack - Enemy is HOUSE_GOOD \n"); }
-	if (Enemy == HOUSE_NEUTRAL && CurUnits > 0) { CCDebugString("AI_Attack - Enemy is HOUSE_NEUTRAL \n"); }
-	if (Enemy >= HOUSE_MULTI1 && Enemy <= HOUSE_MULTI6 && CurUnits > 0) {
-		CCDebugString("AI_Attack - Enemy is a Multi-House \n");
-	}
-	if (Enemy != HOUSE_NONE) {
-		rallypoint = GenerateRallyPoint();
-	}
-
-	if (!shuffle && CurUnits > 0) {
-		char var7[256];
-		sprintf(var7, "AI_Attack - Not on Shuffle loop: \t %d min %d sec \n", Frame / 1942, ((Frame % 1942) * 60) / 1942);
-		CCDebugString(var7);
-	}
-
 	int index;
 	for (index = 0; index < Aircraft.Count(); index++) {
 		AircraftClass * a = Aircraft.Ptr(index);
 
 		if (a != NULL && !a->IsInLimbo && a->House == this && a->Strength > 0) {
-			if (!shuffle && a->Is_Weapon_Equipped() && (forced || Percent_Chance(75))) {
+			if (!shuffle && a->Is_Weapon_Equipped() && (forced || Percent_Chance(80))) {
 				a->Assign_Mission(MISSION_HUNT);
 			}
-		}
-	}
-
-	if (CurUnits > 0) {
-		for (index = 0; index < Units.Count(); index++) {
-			UnitClass * u = Units.Ptr(index);
-
-			if (u != NULL && !u->IsInLimbo && u->House == this && u->Strength > 0) {
-
-				// #MinorAIFixes - Send all units to attack, not 75%
-				//			if (!shuffle && u->Is_Weapon_Equipped() && (forced || Percent_Chance(75))) {
-				if (!shuffle && u->Is_Weapon_Equipped()) {
-					if (Enemy != HOUSE_NONE && (rallystatus == SKIRMISH_COMPLETED || rallystatus == SKIRMISH_RALLYING)) {
-						CCDebugString("AI_Attack - moving Unit to rally point \n");
-						u->ArchiveTarget = ::As_Target(rallypoint);
-						rallystatus = SKIRMISH_RALLYING;
-					}
-					else {
-						CCDebugString("AI_Attack - sending a Unit to Hunt \n");
-						u->Assign_Mission(MISSION_HUNT);
-						rallystatus = SKIRMISH_ATTACKING;
-					}
-				}
-				else {
-					/*
-					**	If this unit is guarding the base, then cause it to shuffle
-					**	location instead.
-					*/
-					if (Percent_Chance(20) && u->Mission == MISSION_GUARD_AREA && Which_Zone(u) != ZONE_NONE) {
-						u->ArchiveTarget = ::As_Target(Where_To_Go(u));
-					}
+			/*
+			** Kerekupai: Transport helis resting on ground at base guard area
+			**			  If they have cargo, send them hunting
+			*/
+			if (*a == AIRCRAFT_TRANSPORT && a->Altitude == 0 && Which_Zone(a) != ZONE_NONE) {
+				//a->Assign_Mission(MISSION_GUARD_AREA); // moved to ::AI() Aircraft.cpp
+				if (a->Is_Something_Attached() && a->Class->Max_Passengers() - a->How_Many() == 0) {
+					a->Assign_Mission(MISSION_HUNT);
 				}
 			}
+			/*
+			** Kerekupai: end of Transport helis resting on ground at base guard area
+			*/
+
 		}
 	}
+	for (index = 0; index < Units.Count(); index++) {
+		UnitClass * u = Units.Ptr(index);
 
-	/*
-	**	#MinorAIfixes - dont't use Infantry to set rallystatus enum, their 75% chance of attacking messes with it.
-	*/
-	if (CurInfantry > 0) {
-		for (index = 0; index < Infantry.Count(); index++) {
-			InfantryClass * i = Infantry.Ptr(index);
+		if (u != NULL && !u->IsInLimbo && u->House == this && u->Strength > 0) {
+			if(!shuffle && u->Is_Weapon_Equipped() && (forced || Percent_Chance(90))) {
+				/*
+				** Kerekupai: set archive target to none to prevent units coming back to base from the assault
+				*/
+				u->ArchiveTarget = TARGET_NONE;
+				/*
+				** Kerekupai: end of set archive target to none to prevent units coming back to base from the assault
+				*/
+				u->Assign_Mission(MISSION_HUNT);
+			}
+			else {
 
-			if (i != NULL && !i->IsInLimbo && i->House == this && i->Strength > 0) {
-				if (!shuffle && (i->Is_Weapon_Equipped() || *i == INFANTRY_RENOVATOR) && (forced || Percent_Chance(75))) {
-					//				i->Assign_Mission(MISSION_HUNT);
-					if (Enemy != HOUSE_NONE && (rallystatus == SKIRMISH_COMPLETED || rallystatus == SKIRMISH_RALLYING)) {
-						CCDebugString("AI_Attack - moving Infantry to rally point \n");
-						i->ArchiveTarget = ::As_Target(rallypoint);
-					}
-					else {
-						CCDebugString("AI_Attack - sending Infantry to Hunt \n");
-						i->Assign_Mission(MISSION_HUNT);
-					}
-				}
-				else {
-
-					/*
-					**	If this soldier is guarding the base, then cause it to shuffle
-					**	location instead.
-					*/
-					if (Percent_Chance(20) && i->Mission == MISSION_GUARD_AREA && Which_Zone(i) != ZONE_NONE) {
-						i->ArchiveTarget = ::As_Target(Where_To_Go(i));
-					}
+				/*
+				**	If this unit is guarding the base, then cause it to shuffle
+				**	location instead.
+				*/
+				if (Percent_Chance(20) && u->Mission == MISSION_GUARD_AREA && Which_Zone(u) != ZONE_NONE) {
+					u->ArchiveTarget = ::As_Target(Where_To_Go(u));
 				}
 			}
+			/*
+			** Kerekupai: if the unit is far away from home, then send it hunting
+			**			  this may affect those units discovered from crates
+			*/
+			if (u->Is_Weapon_Equipped() && u->Mission != MISSION_HUNT) {
+				if (Distance(u->Coord, Center) >= 5 * Radius) {
+					u->Assign_Mission(MISSION_HUNT);
+				}
+				if (Which_Zone(u) == ZONE_NONE && Distance(u->Coord, Center) < 5 * Radius) {
+					u->Assign_Mission(MISSION_GUARD_AREA);
+					u->ArchiveTarget = ::As_Target(Where_To_Go(u));
+				}
+			}
+			/*
+			** Kerekupai: end of if the unit is far away from home, then send it hunting
+			*/
 		}
 	}
+	for (index = 0; index < Infantry.Count(); index++) {
+		InfantryClass * i = Infantry.Ptr(index);
 
-	if (rallystatus == SKIRMISH_RALLYING) {
-		rallystatus = SKIRMISH_RALLIED;
-		CCDebugString("AI_Attack - Setting status to Rallied \n");
-	}
-	if (rallystatus == SKIRMISH_ATTACKING) {
-		rallystatus = SKIRMISH_COMPLETED;
-		CCDebugString("AI_Attack - Setting status to Completed \n");
-	}
+		if (i != NULL && !i->IsInLimbo && i->House == this && i->Strength > 0) {
+			if (!shuffle && (i->Is_Weapon_Equipped() || *i == INFANTRY_RENOVATOR) && (forced || Percent_Chance(75))) {
+				/*
+				** Kerekupai: set archive target to none to prevent units coming back to base from the assault
+				*/
+				i->ArchiveTarget = TARGET_NONE;
+				/*
+				** Kerekupai: end of set archive target to none to prevent units coming back to base from the assault
+				*/
+				
+				i->Assign_Mission(MISSION_HUNT);
+				/*
+				** Kerekupai: AI engineers capture oil derricks
+				**			  The AI assings the engineer to a randomly selected structure from 
+				**			  the available oil derricks
+				*/ 
+				int const N = 100;
+				int list[N];
+				int n = 0;
+				if (*i == INFANTRY_RENOVATOR)	  // if this infantry is an engineer		 
+				{
+					for (int index = 0; index < Buildings.Count(); index++) {
+						BuildingClass * b = Buildings.Ptr(index);
 
-	if (rallystatus == SKIRMISH_RALLIED) {
-		Attack = 1200;
-		//Attack = Rule.AttackInterval * Random_Pick(TICKS_PER_MINUTE / 2, TICKS_PER_MINUTE * 2);
-	}
-	else {
-		Attack = Rule.AttackInterval * Random_Pick(TICKS_PER_MINUTE / 2, TICKS_PER_MINUTE * 2);
-	}
+						if (b != NULL && *b == STRUCT_PUMP && !Is_Ally(b->House) &&
+							n < N) {
+							list[n] = index; // store the index value of the building
+							n++;			 // update counter
+						}
+					}
+					// Randomly select among the available oil derricks and assing mission to the engineer
+					if (n > 0 && n <= N)
+					{
+						//i->Assign_Target(Buildings.Ptr(list[(rand() % n)])->As_Target());
+						i->Assign_Destination(Buildings.Ptr(list[(rand() % n)])->As_Target());
+						i->Assign_Mission(MISSION_CAPTURE);
+					}
+				}
+				/*
+				** Kerekupai: end of AI engineers capture oil derricks
+				*/ 
+			}
+			else {
 
+				/*
+				**	If this soldier is guarding the base, then cause it to shuffle
+				**	location instead.
+				*/
+				if (Percent_Chance(20) && i->Mission == MISSION_GUARD_AREA && Which_Zone(i) != ZONE_NONE) {
+					i->ArchiveTarget = ::As_Target(Where_To_Go(i));
+				}
+			}
+			/*
+			** Kerekupai: if the infantry is far away from home, then send it hunting
+			**			  this may affect those discovered from crates
+			*/
+			if ((i->Is_Weapon_Equipped() || *i == INFANTRY_RENOVATOR) && i->Mission != MISSION_HUNT && i->Mission != MISSION_CAPTURE) {
+				if (Distance(i->Coord, Center) >= 5 * Radius) {
+					i->Assign_Mission(MISSION_HUNT);
+				}
+				if (Which_Zone(i) == ZONE_NONE && Distance(i->Coord, Center) < 5 * Radius) {
+					i->Assign_Mission(MISSION_GUARD_AREA);
+					i->ArchiveTarget = ::As_Target(Where_To_Go(i));
+				}	
+			}
+			/*
+			** Kerekupai: end of if the infantry is far away from home, then send it hunting
+			*/
+		}
+	}
+	Attack = Rule.AttackInterval * Random_Pick(TICKS_PER_MINUTE / 2, TICKS_PER_MINUTE * 2);
 	return(true);
 }
 
@@ -6175,7 +6231,9 @@ bool HouseClass::AI_Build_Engineer(UrgencyType ) const
 bool HouseClass::AI_Lower_Power(UrgencyType ) const
 {
 	//assert(Houses.ID(this) == ID);
-	// kerekupai: AI does not sell power plants
+	/*
+	** kerekupai: AI does not sell power plants in skirmish
+	*/ 
 	if (GameToPlay == GAME_NORMAL)
 	{
 		BuildingClass * b = Find_Building(STRUCT_POWER);
@@ -6321,18 +6379,18 @@ bool HouseClass::AI_Raise_Money(UrgencyType urgency) const
 	} _types[] = {
 		{STRUCT_BIO_LAB, URGENCY_LOW},
 		{STRUCT_EYE, URGENCY_MEDIUM},
-		{STRUCT_RADAR, URGENCY_MEDIUM},
+		//{STRUCT_RADAR, URGENCY_MEDIUM},
 		//{STRUCT_STORAGE,URGENCY_LOW}, // kerekupai: avoid selling silos
 		{STRUCT_REPAIR, URGENCY_MEDIUM},
 		{STRUCT_OBELISK, URGENCY_HIGH},
-		{STRUCT_TURRET, URGENCY_HIGH},
+		//{STRUCT_TURRET, URGENCY_HIGH},
 		{STRUCT_ATOWER, URGENCY_HIGH},
-		{STRUCT_GTOWER, URGENCY_HIGH},
-		{STRUCT_HELIPAD,URGENCY_MEDIUM},
-		{STRUCT_AIRSTRIP,URGENCY_HIGH},
-		{STRUCT_WEAP,URGENCY_HIGH},
-		{STRUCT_POWER,URGENCY_HIGH},
-		{STRUCT_CONST,URGENCY_CRITICAL}
+		//{STRUCT_GTOWER, URGENCY_HIGH},
+		//{STRUCT_HELIPAD,URGENCY_MEDIUM},
+		//{STRUCT_AIRSTRIP,URGENCY_HIGH},
+		//{STRUCT_WEAP,URGENCY_HIGH},
+		//{STRUCT_POWER,URGENCY_HIGH},
+		//{STRUCT_CONST,URGENCY_CRITICAL}
 	};
 
 
@@ -6474,7 +6532,7 @@ bool HouseClass::Sell_Some_Structures()
 		
 	}
 
-	if (BQuantity[STRUCT_AIRSTRIP] > 2 || BQuantity[STRUCT_WEAP] > 2)
+	if (BQuantity[STRUCT_AIRSTRIP] + BQuantity[STRUCT_WEAP] > 1)
 	{
 		BuildingClass * b = Find_Building(STRUCT_AIRSTRIP);
 		if (b == NULL) {
@@ -6557,6 +6615,54 @@ bool HouseClass::Sell_Some_Structures()
 	return false;
 }
 
+
+/***********************************************************************************************
+ * HouseClass::Do_Uncloak_All -- AI cloaked units and structures are uncloaked					   *
+ *                                                                                             *
+ *                                                                                             *
+ * INPUT:   none                                                                               *
+ *                                                                                             *
+ * OUTPUT:  boolean true if cloaked units / structures were found							   *
+ *                                                                                             *
+ * WARNINGS:   none                                                                            *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   07/02/2022 Kerekupai : Created.                                                           *
+ *=============================================================================================*/
+bool HouseClass::Do_Uncloak_All()
+{
+	bool something_cloaked = false;
+
+	// infantry
+	for (int index = 0; index < Infantry.Count(); index++) {
+		InfantryClass * i = Infantry.Ptr(index);
+		if (i != NULL && i->Cloak == CLOAKED) {
+			i->Do_Uncloak();
+			something_cloaked = true;
+		}
+	}
+	// Unit
+	for (int index = 0; index < Units.Count(); index++) {
+		UnitClass * u = Units.Ptr(index);
+		if (u != NULL && u->Cloak == CLOAKED) {
+			u->Do_Uncloak();
+			something_cloaked = true;
+		}
+	}
+	// Buildings
+	for (int index = 0; index < Buildings.Count(); index++) {
+		BuildingClass * b = Buildings.Ptr(index);
+		if (b != NULL && b->Cloak == CLOAKED) {
+			b->Do_Uncloak();
+			something_cloaked = true;
+		}
+	}
+	// We skip aircraft
+	return something_cloaked;
+}
+
+
+
 /***********************************************************************************************
  * HouseClass::AI_Building -- Determines what building to build.                               *
  *                                                                                             *
@@ -6622,18 +6728,23 @@ int HouseClass::AI_Building(void)
 		**	Try to build a power plant if there is insufficient power and there is enough
 		**	money available.
 		*/
+
 		b = &BuildingTypeClass::As_Reference(STRUCT_ADVANCED_POWER);
-		if (Can_Build(b, ActLike) && Power <= Drain+Rule.PowerSurplus && b->Cost_Of() < money) {
+		if (Can_Build(b, ActLike) && Power <= Drain + Rule.PowerSurplus && (b->Cost_Of() < money || hasincome)) {
 			choiceptr = BuildChoice.Alloc();
 			if (choiceptr != NULL) {
-				*choiceptr = BuildChoiceClass(BQuantity[STRUCT_REFINERY] == 0 ? URGENCY_LOW : URGENCY_MEDIUM, b->Type);
+				// Kerekupai: if no power, then urgent critical, else, medium (default)
+				//*choiceptr = BuildChoiceClass(BQuantity[STRUCT_REFINERY] == 0 ? URGENCY_LOW : URGENCY_CRITICAL, b->Type);
+				*choiceptr = BuildChoiceClass(Power_Fraction() < 0x0100 ? URGENCY_CRITICAL : URGENCY_HIGH, b->Type);
 			}
 		} else {
 			b = &BuildingTypeClass::As_Reference(STRUCT_POWER);
-			if (Can_Build(b, ActLike) && Power <= Drain+Rule.PowerSurplus && b->Cost_Of() < money) {
+			if (Can_Build(b, ActLike) && Power <= Drain + Rule.PowerSurplus && (b->Cost_Of() < money || hasincome)) {
 				choiceptr = BuildChoice.Alloc();
 				if (choiceptr != NULL) {
-					*choiceptr = BuildChoiceClass(BQuantity[STRUCT_REFINERY] == 0 ? URGENCY_LOW : URGENCY_MEDIUM, b->Type);
+					// Kerekupai
+					//*choiceptr = BuildChoiceClass(BQuantity[STRUCT_REFINERY] == 0 ? URGENCY_LOW : URGENCY_MEDIUM, b->Type);
+					*choiceptr = BuildChoiceClass(Power_Fraction() < 0x0100 ? URGENCY_HIGH : URGENCY_MEDIUM, b->Type);
 				}
 			}
 		}
@@ -6647,7 +6758,7 @@ int HouseClass::AI_Building(void)
 			if (Can_Build(b, ActLike) && (money > b->Cost_Of() || hasincome)) {
 				choiceptr = BuildChoice.Alloc();
 				if (choiceptr != NULL) {
-					*choiceptr = BuildChoiceClass(BQuantity[STRUCT_REFINERY] == 0 ? URGENCY_HIGH : URGENCY_MEDIUM, b->Type);
+					*choiceptr = BuildChoiceClass(BQuantity[STRUCT_REFINERY] > 0 ? URGENCY_HIGH : URGENCY_CRITICAL, b->Type);
 				}
 			}
 		}
@@ -6663,7 +6774,7 @@ int HouseClass::AI_Building(void)
 			if (Can_Build(b, ActLike) && (b->Cost_Of() < money || hasincome)) {
 				choiceptr = BuildChoice.Alloc();
 				if (choiceptr != NULL) {
-					*choiceptr = BuildChoiceClass(current > 0 ? URGENCY_LOW : URGENCY_MEDIUM, b->Type);
+					*choiceptr = BuildChoiceClass(current > 1 ? URGENCY_MEDIUM : URGENCY_HIGH, b->Type); // Kerekupai default low : medium
 				}
 			} else {
 				//b = &BuildingTypeClass::As_Reference(STRUCT_TENT);
@@ -6671,7 +6782,7 @@ int HouseClass::AI_Building(void)
 				if (Can_Build(b, ActLike) && (b->Cost_Of() < money || hasincome)) {
 					choiceptr = BuildChoice.Alloc();
 					if (choiceptr != NULL) {
-						*choiceptr = BuildChoiceClass(current > 0 ? URGENCY_LOW : URGENCY_MEDIUM, b->Type);
+						*choiceptr = BuildChoiceClass(current > 1 ? URGENCY_MEDIUM : URGENCY_HIGH, b->Type); // Kerekupai default low : medium
 					}
 				}
 			}
@@ -6685,30 +6796,27 @@ int HouseClass::AI_Building(void)
 		*/
 		unsigned int n_silos;
 		// if AI does not build silos, then problem here!
-		if (!IsHuman &&
-			GameToPlay != GAME_NORMAL)
-		{
-			// PlayerPtr->Difficulty
-			if (Difficulty == DIFF_HARD) { n_silos = 8; }
-			else if (Difficulty == DIFF_NORMAL) { n_silos = 4; }
-			else if (Difficulty == DIFF_EASY) { n_silos = 2; }
-		}
-
-
+		// PlayerPtr->Difficulty
+		if (Difficulty == DIFF_HARD) { n_silos = 8; }
+		else if (Difficulty == DIFF_NORMAL) { n_silos = 4; }
+		else if (Difficulty == DIFF_EASY) { n_silos = 2; }
 
 		current = BQuantity[STRUCT_STORAGE];
-		if (current < n_silos && money > 990 + (int)(current) * 990) //|| hasincome
+		if (current < n_silos && hasincome && money > (2000 * BQuantity[STRUCT_REFINERY]))
 		{
 			b = &BuildingTypeClass::As_Reference(STRUCT_STORAGE);
 			if (Can_Build(b, ActLike) && (b->Cost_Of() < money || hasincome)) {
 				choiceptr = BuildChoice.Alloc();
 				if (choiceptr != NULL) {
-					*choiceptr = BuildChoiceClass(current > 2 ? URGENCY_LOW : URGENCY_MEDIUM, b->Type);
+					*choiceptr = BuildChoiceClass(current > 2 ? URGENCY_LOW : URGENCY_HIGH, b->Type);
 				}
 			}
 		}
 
-		// Kerekupai: AI builds hospital
+		/*
+		** Kerekupai: AI builds hospital
+		**			  maximum of 2 hospital buildings
+		*/ 
 		current = BQuantity[STRUCT_HOSPITAL];
 		if (current < 2)
 		{
@@ -6716,10 +6824,13 @@ int HouseClass::AI_Building(void)
 			if (Can_Build(b, ActLike) && (b->Cost_Of() < money || hasincome)) {
 				choiceptr = BuildChoice.Alloc();
 				if (choiceptr != NULL) {
-					*choiceptr = BuildChoiceClass(current > 0 ? URGENCY_LOW : URGENCY_MEDIUM, b->Type);
+					*choiceptr = BuildChoiceClass(current > 0 ? URGENCY_LOW : URGENCY_HIGH, b->Type);
 				}
 			}
 		}
+		/*
+		** Kerekupai: end of AI builds hospital
+		*/
 
 #if (0)
 		/*
@@ -6760,7 +6871,7 @@ int HouseClass::AI_Building(void)
 			if (Can_Build(b, ActLike) && (b->Cost_Of() < money || hasincome)) {
 				choiceptr = BuildChoice.Alloc();
 				if (choiceptr != NULL) {
-					*choiceptr = BuildChoiceClass(current > 0 ? URGENCY_LOW : URGENCY_MEDIUM, b->Type);
+					*choiceptr = BuildChoiceClass(current > 1 ? URGENCY_MEDIUM : URGENCY_HIGH, b->Type); // kerekupai: default low : medium
 				}
 			}
 		}
@@ -6779,16 +6890,38 @@ int HouseClass::AI_Building(void)
 						threat_quantity = enemy->CurAircraft;
 					}*/
 					// Kerekupai:
-					*choiceptr = BuildChoiceClass(current > 0 ? URGENCY_LOW : URGENCY_MEDIUM, b->Type);
+					*choiceptr = BuildChoiceClass(current > 1 ? URGENCY_MEDIUM : URGENCY_HIGH, b->Type); // kerekupai: default low : medium
 					// *choiceptr = BuildChoiceClass((CurAircraft < (unsigned)threat_quantity) ? URGENCY_LOW : URGENCY_MEDIUM, b->Type);
 				}
 			}
 		}
 
 		/*
+		** Kerekupai: AI can build Radar dome even if there is no air threat
+		*/
+		if (BQuantity[STRUCT_RADAR] == 0) {
+			b = &BuildingTypeClass::As_Reference(STRUCT_RADAR);
+			if (Can_Build(b, ActLike) && (b->Cost_Of() < money || hasincome)) {
+				choiceptr = BuildChoice.Alloc();
+				if (choiceptr != NULL) {
+					*choiceptr = BuildChoiceClass(URGENCY_MEDIUM, b->Type);
+				}
+			}
+		}
+		/*
+		** Kerekupai: end of AI can build Radar dome even if there is no air threat
+		*/
+
+
+		/*
 		**	A helipad would be good.
 		*/
+		/*
+		** Kerekupai: manage urgency for creation of helis and aircraft
+		**			  based on air threat
+		*/
 		current = BQuantity[STRUCT_HELIPAD];
+		UrgencyType urgency = URGENCY_MEDIUM;
 		if (current < Round_Up(Rule.HelipadRatio*fixed(CurBuildings)) && current < (unsigned)Rule.HelipadLimit) {
 			b = &BuildingTypeClass::As_Reference(STRUCT_HELIPAD);
 			if (Can_Build(b, ActLike) && (b->Cost_Of() < money || hasincome)) {
@@ -6797,16 +6930,19 @@ int HouseClass::AI_Building(void)
 					int threat_quantity = 0;
 					if (enemy != NULL) {
 						threat_quantity = enemy->CurAircraft;
+						if (CurAircraft < (unsigned)threat_quantity)
+							urgency++; // increase the urgency value if air threat present
 					}
 					// kerekupai
 					//*choiceptr = BuildChoiceClass((CurAircraft < (unsigned)threat_quantity) ? URGENCY_HIGH : URGENCY_MEDIUM, b->Type);
-					*choiceptr = BuildChoiceClass((CurAircraft > 1) ? URGENCY_LOW : URGENCY_MEDIUM, b->Type);
+					//*choiceptr = BuildChoiceClass((CurAircraft < (unsigned)threat_quantity) ? URGENCY_HIGH : URGENCY_MEDIUM, b->Type);
+					*choiceptr = BuildChoiceClass((current > 1) ? urgency : URGENCY_HIGH, b->Type);
 				}
 			}
 		}
-
+		
 		/* Kerekupai: AI Build repair Pad (normal and hard difficulty only) */
-		bool can_build;
+		bool can_build = false;
 		if (!IsHuman && GameToPlay != GAME_NORMAL && Difficulty == DIFF_NORMAL) // this->Difficulty
 		{
 			can_build = true;
@@ -6823,7 +6959,6 @@ int HouseClass::AI_Building(void)
 		/*
 		**	Build some air defense.
 		*/
-		//current = BQuantity[STRUCT_SAM] + BQuantity[STRUCT_AAGUN];
 		current = BQuantity[STRUCT_SAM];
 		if (current < Round_Up(Rule.AARatio*fixed(CurBuildings)) && current < (unsigned)Rule.AALimit) {
 
@@ -6865,7 +7000,7 @@ int HouseClass::AI_Building(void)
 					if (choiceptr != NULL) {
 						// kerekupai
 						//*choiceptr = BuildChoiceClass((current < (unsigned)threat_quantity) ? URGENCY_HIGH : URGENCY_MEDIUM, b->Type);
-						*choiceptr = BuildChoiceClass((current > 2) ? URGENCY_LOW : URGENCY_HIGH, b->Type);
+						*choiceptr = BuildChoiceClass((current > 2) ? URGENCY_MEDIUM : URGENCY_HIGH, b->Type);
 					}
 				}
 				else {
@@ -6886,6 +7021,7 @@ int HouseClass::AI_Building(void)
 		/* Kerekupai: AI builds defenses according to difficulty level          */
 		int q = 1; // if easy, reduce by half number of defenses
 		if (Difficulty == DIFF_EASY) { q = 0.5; }
+		//int desired_fraction = 1;
 
 		/*
 		**	Always build up some base defense.
@@ -6907,9 +7043,11 @@ int HouseClass::AI_Building(void)
 			else { // build advance turret
 				if (ActLike == HOUSE_BAD) {
 					b = &BuildingTypeClass::As_Reference(STRUCT_OBELISK);
+					//desired_fraction = 1;
 				}
 				else if (ActLike == HOUSE_GOOD) {
 					b = &BuildingTypeClass::As_Reference(STRUCT_ATOWER);
+					//desired_fraction = 1;
 				}
 			}
 			// Kerekupai: manage defense urgency value
@@ -6918,15 +7056,15 @@ int HouseClass::AI_Building(void)
 				u = URGENCY_HIGH;
 			}
 			else if (current < (unsigned)Rule.DefenseLimit) {
-				u = URGENCY_MEDIUM;
+				u = URGENCY_HIGH;
 			}
 			else {
-				u = URGENCY_LOW;
+				u = URGENCY_MEDIUM;
 			}
 			if (State == STATE_ATTACKED) {
 				u++;
 			}
-			if (Can_Build(b, ActLike) && (b->Cost_Of() < money || hasincome) && Power_Fraction() >= 1) {
+			if (Can_Build(b, ActLike) && (b->Cost_Of() < money || hasincome) && Power_Fraction() > 0x0100) { // kerekupai: before 1
 				choiceptr = BuildChoice.Alloc();
 				if (choiceptr != NULL) {
 					*choiceptr = BuildChoiceClass(u, b->Type);
@@ -6958,52 +7096,48 @@ int HouseClass::AI_Building(void)
 		}
 		/* Kerekupai: end of base defenses                              */
 
-		// GDI repair pad:
+		/*
+		** Kerekupai: AI creates repair pad
+		*/
 		if (BQuantity[STRUCT_REPAIR] == 0 &&
-			can_build == true //&&
-			//!this->IsHuman
+			can_build == true
 			) {
 			b = &BuildingTypeClass::As_Reference(STRUCT_REPAIR);
-			if (Can_Build(b, ActLike) && (b->Cost_Of() < money || hasincome) && ActLike == HOUSE_GOOD) {
+			if (Can_Build(b, ActLike) && (b->Cost_Of() < money || hasincome)) {
 				choiceptr = BuildChoice.Alloc();
 				if (choiceptr != NULL) {
-					*choiceptr = BuildChoiceClass(BQuantity[STRUCTF_WEAP] > 1 ? URGENCY_HIGH : URGENCY_LOW, b->Type);
+					*choiceptr = BuildChoiceClass(BQuantity[STRUCT_WEAP] + BQuantity[STRUCT_AIRSTRIP] > 1 ? URGENCY_HIGH : URGENCY_LOW, b->Type);
 				}
 			}
 		}
-
-		// Nod Build repair Pad
-		if (BQuantity[STRUCT_REPAIR] == 0 &&
-			can_build == true //&&
-			//!this->IsHuman
-			)
-		{
-			b = &BuildingTypeClass::As_Reference(STRUCT_REPAIR);
-			if (Can_Build(b, ActLike) && (b->Cost_Of() < money || hasincome) && ActLike == HOUSE_BAD) {
-				choiceptr = BuildChoice.Alloc();
-				if (choiceptr != NULL) {
-					*choiceptr = BuildChoiceClass(BQuantity[STRUCT_AIRSTRIP] > 1 ? URGENCY_HIGH : URGENCY_LOW, b->Type);
-				}
-			}
-		}
-
-		/* Kerekupai: end of repair pad                                        */
-
+		/*
+		** Kerekupai: end of AI creates repair pad
+		*/
+		
 		/* Kerekupai: AI builds superweapons (not when easy)                     */
 
 		// Kerekupai: manage defense urgency value
 		UrgencyType u;
 		bool superweapon_is_present = false;
-		// check if a player has already a superweapon
-		if (enemy != NULL &&
-			(enemy->BQuantity[STRUCT_TEMPLE] > 0 || enemy->BQuantity[STRUCT_EYE] > 0))
-		{
-				superweapon_is_present = true;
+		// check if a enemy has already a superweapon
+		for (HousesType house2 = HOUSE_MULTI1; house2 < HOUSE_COUNT; house2++) {
+			HouseClass * hptr = HouseClass::As_Pointer(house2);
+			if (hptr != NULL && hptr ->IsActive && !hptr->IsDefeated) {
+				if(hptr->BQuantity[STRUCT_TEMPLE] > 0 || hptr->BQuantity[STRUCT_EYE] > 0)
+				{
+					superweapon_is_present = true;
+				}
+			}
 		}
+		//if (enemy != NULL &&
+		//	(enemy->BQuantity[STRUCT_TEMPLE] > 0 || enemy->BQuantity[STRUCT_EYE] > 0))
+		//{
+		//		superweapon_is_present = true;
+		//}
 		if (BQuantity[STRUCT_REPAIR] > 0 || superweapon_is_present) {
 			u = URGENCY_HIGH;
 		} else {
-			u = URGENCY_LOW;
+			u = URGENCY_MEDIUM;
 		}
 		/*else if (superweapon_is_present) {
 			u = URGENCY_CRITICAL;
@@ -7112,12 +7246,18 @@ int HouseClass::AI_Building(void)
 			if (BuildChoice.Ptr(index)->Urgency > best) {
 				bestindex = index;
 				best = BuildChoice.Ptr(index)->Urgency;
-				
-				// update list
-				list[n] = bestindex;
-				n++;
 			}
 		}
+		for (int index = 0; index < BuildChoice.Count(); index++) {
+			if (BuildChoice.Ptr(index)->Urgency == best) {
+				// update list
+				if (n < N) {
+					list[n] = index;
+					n++;
+				}
+			}
+		}
+
 		// perform a random pick if more than one structure have the same priority
 		if (n > 0 && n <= N) 
 		{
@@ -7261,7 +7401,23 @@ int HouseClass::AI_Unit(void)
 				//if (utype->PrimaryWeapon != NULL) {
 				if (utype->Primary != WEAPON_NONE) {
 					counter[index] = 20;
-				} else {
+				}
+				/*
+				** Kerekupai: AI limited to two construction yards
+				*/
+				else if (utype->Type == UNIT_MCV) {
+					if (BQuantity[STRUCT_CONST] + UQuantity[UNIT_MCV] < 2)
+					{
+						counter[index] = 1;
+					}
+					else {
+						counter[index] = 0;
+					}
+				}
+				/*
+				** Kerekupai: end of AI limited to two construction yards
+				*/
+				else {
 					counter[index] = 1;
 				}
 			} else {
@@ -7520,6 +7676,13 @@ int HouseClass::AI_Infantry(void)
 			enemy = HouseClass::As_Pointer(Enemy);
 		}
 
+		// Kerekupai: enemy vehicle factory present?
+		bool factory = false;
+		if (enemy != NULL && (enemy->BQuantity[STRUCT_AIRSTRIP] > 0 || enemy->BQuantity[STRUCT_WEAP] > 0)) 
+		{
+			factory = true;
+		}
+
 		/*
 		**	This structure is used to keep track of the list of infantry types that should be
 		**	built. The infantry type and the value assigned to it is recorded.
@@ -7543,25 +7706,33 @@ int HouseClass::AI_Infantry(void)
 #endif
 
 					switch (index) {
-						case INFANTRY_E1:
-							typetrack[count].Value = 3;
+						case INFANTRY_E1: // minigunner
+							
+								typetrack[count].Value = 5; // default 3
 							break;
 
-						case INFANTRY_E2:
-							typetrack[count].Value = 5;
+						case INFANTRY_E2: // grenadier
+							
+								typetrack[count].Value = 3; // default 5
 							break;
 
-						case INFANTRY_E3:
-							typetrack[count].Value = 2;
+						case INFANTRY_E3: // bazooka
+							if (factory)
+							{
+								typetrack[count].Value = 3; // default 2
+							}
+							else {
+								typetrack[count].Value = 2;
+							}
 							break;
 
-						case INFANTRY_E4:
-							typetrack[count].Value = 5;
+						case INFANTRY_E4: // flame thrower
+							typetrack[count].Value = 3; // default 5
 							break;
 						
 						// Kerekupai: AI trains chemical warrior
 						case INFANTRY_E5:
-							typetrack[count].Value = 5;
+							typetrack[count].Value = 2;
 							break;
 
 						//case INFANTRY_RENOVATOR:
@@ -7573,10 +7744,7 @@ int HouseClass::AI_Infantry(void)
 
 						/* Kerekupai: enable AI to build commando (not when easy)   */
 						case INFANTRY_RAMBO:
-							if (Difficulty != DIFF_EASY)
-							{
 								typetrack[count].Value = 1;
-							}// - max(IQuantity[index], 0); }
 							break;
 
 						default:
@@ -7632,6 +7800,11 @@ int HouseClass::AI_Aircraft(void)
 {
 	//assert(Houses.ID(this) == ID);
 
+	/*
+	** Kerekupai: fix. The structure it should refer to is the helipad, not the airstrip!
+	**			  As well, enable the creation of transport helicopters (if base building)
+	*/
+
 	if (!IsHuman && IQ >= Rule.IQAircraft) {
 		if (BuildAircraft != AIRCRAFT_NONE) return(TICKS_PER_SECOND);
 		if (CurAircraft >= Control.MaxAircraft) return(TICKS_PER_SECOND);
@@ -7639,19 +7812,30 @@ int HouseClass::AI_Aircraft(void)
 		if (Can_Build(&AircraftTypeClass::As_Reference(AIRCRAFT_HELICOPTER), ActLike) &&
 				 //AircraftTypeClass::As_Reference(AIRCRAFT_MIG).Level <= (unsigned)Control.TechLevel &&
 				 AircraftTypeClass::As_Reference(AIRCRAFT_HELICOPTER).Level <= (unsigned)BuildLevel &&
-				 BQuantity[STRUCT_AIRSTRIP] > AQuantity[AIRCRAFT_HELICOPTER] + AQuantity[AIRCRAFT_ORCA]) {
+				 BQuantity[STRUCT_HELIPAD] > AQuantity[AIRCRAFT_HELICOPTER] + AQuantity[AIRCRAFT_ORCA]) {
 			BuildAircraft = AIRCRAFT_HELICOPTER;
 			return(TICKS_PER_SECOND);
 		}
 
+		
 		if (Can_Build(&AircraftTypeClass::As_Reference(AIRCRAFT_ORCA), ActLike) &&
-				 //AircraftTypeClass::As_Reference(AIRCRAFT_YAK).Level <= (unsigned)Control.TechLevel &&
-				 AircraftTypeClass::As_Reference(AIRCRAFT_ORCA).Level <= (unsigned)BuildLevel &&
-				 BQuantity[STRUCT_AIRSTRIP] > AQuantity[AIRCRAFT_ORCA] + AQuantity[AIRCRAFT_HELICOPTER]) {
+			//AircraftTypeClass::As_Reference(AIRCRAFT_YAK).Level <= (unsigned)Control.TechLevel &&
+			AircraftTypeClass::As_Reference(AIRCRAFT_ORCA).Level <= (unsigned)BuildLevel &&
+			BQuantity[STRUCT_HELIPAD] > AQuantity[AIRCRAFT_ORCA] + AQuantity[AIRCRAFT_HELICOPTER]) {
 			BuildAircraft = AIRCRAFT_ORCA;
 			return(TICKS_PER_SECOND);
 		}
 
+		if (IsBaseBuilding) // only skirmish
+		{
+			if (Can_Build(&AircraftTypeClass::As_Reference(AIRCRAFT_TRANSPORT), ActLike) &&
+				//AircraftTypeClass::As_Reference(AIRCRAFT_YAK).Level <= (unsigned)Control.TechLevel &&
+				AircraftTypeClass::As_Reference(AIRCRAFT_TRANSPORT).Level <= (unsigned)BuildLevel &&
+				AQuantity[AIRCRAFT_TRANSPORT] < 1) {
+				BuildAircraft = AIRCRAFT_TRANSPORT;
+				return(TICKS_PER_SECOND);
+			}
+		}
 #if (0)
 		if (Can_Build(&AircraftTypeClass::As_Reference(AIRCRAFT_LONGBOW), ActLike) &&
 				 //AircraftTypeClass::As_Reference(AIRCRAFT_LONGBOW).Level <= (unsigned)Control.TechLevel &&
@@ -8299,9 +8483,48 @@ CELL HouseClass::Where_To_Go(FootClass const * object) const
 		zone = Random_Pick(ZONE_NORTH, ZONE_WEST);
 	}
 
-	// Kerekupai from MinorAIFixes
+	/*
+	** Kerekupai: units avoid cells too close to refineries
+	*/
+	CELL cell;
+	//int const N = Rule.RefineryLimit;
+	// create an array of own refineries
+	BuildingClass * refineries[10];
+	int n = 0;
+	for (int index = 0; index < Buildings.Count(); index++) {
+		BuildingClass * b = Buildings.Ptr(index);
+
+		if (b != NULL && *b == STRUCT_REFINERY && !b->IsInLimbo &&
+			(HouseClass *)b->House == this && b->Strength > 0) {
+			refineries[n] = b;
+			n++;
+		}
+	}
+
+
+	int radius = 0;
+	int loop_control = 0;
+	while (radius < (4 * CELL_LEPTON_W) && loop_control < 10) {
+		cell = Random_Cell_In_Zone(zone);
+		radius = 20;
+		for (int i = 0; i < n; i++)
+		{
+			// get distance to nearest refinery
+			if (Distance(Cell_Coord(cell), refineries[i]->Center_Coord()) < radius)
+				radius = Distance(Cell_Coord(cell), refineries[i]->Center_Coord());
+		}
+
+		// assign a random zone
+		zone = Random_Pick(ZONE_NORTH, ZONE_WEST);
+		// update loop control
+		loop_control++;
+	}
+
+	/*
+	** Kerekupai: units avoid cells too close to refineries
+	*/
 	//CELL cell = Random_Cell_In_Zone(zone);
-	CELL cell = Random_Cell_In_Zone(zone, false);
+	
 	//assert(cell != 0);
 
 	return(Map.Nearby_Location(cell));	//, SPEED_TRACK, Map[cell].Zones[MZONE_NORMAL], MZONE_NORMAL));
@@ -9060,9 +9283,8 @@ CELL HouseClass::Find_Cell_In_Zone(TechnoClass const * techno, ZoneType zone) co
 	/*
 	**	Pick a random location within the zone specified.
 	*/
-	// Kerekupai from MinorAIFixes
-	//CELL trycell = Random_Cell_In_Zone(zone);
-	CELL trycell = Random_Cell_In_Zone(zone, true);
+	// Kerekupai
+	CELL trycell = Random_Cell_In_Zone(zone);
 
 	short const * list = NULL;
 	if (techno->What_Am_I() == RTTI_BUILDING) {
@@ -9109,7 +9331,6 @@ CELL HouseClass::Find_Cell_In_Zone(TechnoClass const * techno, ZoneType zone) co
  *    clipped to the map edge when necessary.                                                  *
  *                                                                                             *
  * INPUT:   zone  -- The zone to pick a cell from.											   *
- *			BuildingPlacement -- Whether this is for a building or a Unit					   *
  *                                                                                             *
  * OUTPUT:  Returns with a picked cell within the zone. If the entire zone lies outside of the *
  *          map, then a cell in the core zone is returned instead.                             *
@@ -9119,121 +9340,80 @@ CELL HouseClass::Find_Cell_In_Zone(TechnoClass const * techno, ZoneType zone) co
  * HISTORY:                                                                                    *
  *   11/04/1996 JLB : Created.                                                                 *
  *=============================================================================================*/
-CELL HouseClass::Random_Cell_In_Zone(ZoneType zone, bool BuildingPlacement) const
+CELL HouseClass::Random_Cell_In_Zone(ZoneType zone) const
 {
+	COORDINATE coord = 0;
+	int maxdist = 0;
+	switch (zone) {
+	case ZONE_CORE:
+		coord = Coord_Scatter(Center, Random_Pick(0, Radius), true);
+		break;
+
+	case ZONE_NORTH:
+		maxdist = min(Radius * 3, (Coord_Y(Center) - Cell_To_Lepton(Map.MapCellY)) - CELL_LEPTON_H);
+		if (maxdist < 0) break;
+		coord = Coord_Move(Center, (DirType)(Random_Pick(DIR_N, DIR_E) - ((DirType)32)), Random_Pick(min(Radius * 2, maxdist), min(Radius * 3, maxdist)));
+		break;
+
+	case ZONE_EAST:
+		maxdist = min(Radius * 3, (Cell_To_Lepton(Map.MapCellX + Map.MapCellWidth) - Coord_X(Center)) - CELL_LEPTON_W);
+		if (maxdist < 0) break;
+		coord = Coord_Move(Center, Random_Pick(DIR_NE, DIR_SE), Random_Pick(min(Radius * 2, maxdist), min(Radius * 3, maxdist)));
+		break;
+
+	case ZONE_SOUTH:
+		maxdist = min(Radius * 3, (Cell_To_Lepton(Map.MapCellY + Map.MapCellHeight) - Coord_Y(Center)) - CELL_LEPTON_H);
+		if (maxdist < 0) break;
+		coord = Coord_Move(Center, Random_Pick(DIR_SE, DIR_SW), Random_Pick(min(Radius * 2, maxdist), min(Radius * 3, maxdist)));
+		break;
+
+	case ZONE_WEST:
+		maxdist = min(Radius * 3, (Coord_X(Center) - Cell_To_Lepton(Map.MapCellX)) - CELL_LEPTON_W);
+		if (maxdist < 0) break;
+		coord = Coord_Move(Center, Random_Pick(DIR_SW, DIR_NW), Random_Pick(min(Radius * 2, maxdist), min(Radius * 3, maxdist)));
+		break;
+	}
+
+	/*
+	**	Double check that the location is valid and if so, convert it into a cell
+	**	number.
+	*/
 	CELL cell;
-	bool IsUnderRefinery;
+	if (coord == 0 || !Map.In_Radar(Coord_Cell(coord))) {
+		if (zone == ZONE_CORE) {
 
-	do {
-		IsUnderRefinery = false;
-		COORDINATE coord = 0;
-		int maxdist = 0;
-		switch (zone) {
-		case ZONE_CORE:
-			coord = Coord_Scatter(Center, Random_Pick(0, Radius), true);
-			break;
-
-		case ZONE_NORTH:
-			maxdist = min(Radius * 3, (Coord_Y(Center) - Cell_To_Lepton(Map.MapCellY)) - CELL_LEPTON_H);
-			if (maxdist < 0) break;
-			coord = Coord_Move(Center, (DirType)(Random_Pick(DIR_N, DIR_E) - ((DirType)32)), Random_Pick(min(Radius * 2, maxdist), min(Radius * 3, maxdist)));
-			break;
-
-		case ZONE_EAST:
-			maxdist = min(Radius * 3, (Cell_To_Lepton(Map.MapCellX + Map.MapCellWidth) - Coord_X(Center)) - CELL_LEPTON_W);
-			if (maxdist < 0) break;
-			coord = Coord_Move(Center, Random_Pick(DIR_NE, DIR_SE), Random_Pick(min(Radius * 2, maxdist), min(Radius * 3, maxdist)));
-			break;
-
-		case ZONE_SOUTH:
-			maxdist = min(Radius * 3, (Cell_To_Lepton(Map.MapCellY + Map.MapCellHeight) - Coord_Y(Center)) - CELL_LEPTON_H);
-			if (maxdist < 0) break;
-			coord = Coord_Move(Center, Random_Pick(DIR_SE, DIR_SW), Random_Pick(min(Radius * 2, maxdist), min(Radius * 3, maxdist)));
-			break;
-
-		case ZONE_WEST:
-			maxdist = min(Radius * 3, (Coord_X(Center) - Cell_To_Lepton(Map.MapCellX)) - CELL_LEPTON_W);
-			if (maxdist < 0) break;
-			coord = Coord_Move(Center, Random_Pick(DIR_SW, DIR_NW), Random_Pick(min(Radius * 2, maxdist), min(Radius * 3, maxdist)));
-			break;
-		}
-
-		/*
-		**	Double check that the location is valid and if so, convert it into a cell
-		**	number.
-		*/
-		if (coord == 0 || !Map.In_Radar(Coord_Cell(coord))) {
-			if (zone == ZONE_CORE) {
-
-				/*
-				**	Finding a cell within the core failed, so just pick the center
-				**	cell. This cell is guaranteed to be valid.
-				*/
-				cell = Coord_Cell(Center);
-				char string1[256];
-				sprintf(string1, "Random Cell - Failed so picking centre cell - %d \n", cell);
-				CCDebugString(string1);
-			}
-			else {
-
-				/*
-				**	If the edge fails, then try to find a cell within the core.
-				*/
-				cell = Random_Cell_In_Zone(ZONE_CORE, BuildingPlacement);
-			}
+			/*
+			**	Finding a cell within the core failed, so just pick the center
+			**	cell. This cell is guaranteed to be valid.
+			*/
+			cell = Coord_Cell(Center);
 		}
 		else {
-			cell = Coord_Cell(coord);
-			char string2[256];
-			sprintf(string2, "Random Cell - Succeeded, cell is - %d \n", cell);
-			CCDebugString(string2);
-		}
 
-		/*
-		**	If the randomly picked location is not in the legal map area, then clip it to
-		**	the legal map area.
-		*/
-		if (!Map.In_Radar(cell)) {
-			int x = Cell_X(cell);
-			int y = Cell_Y(cell);
-
-			if (x < Map.MapCellX) x = Map.MapCellX;
-			if (y < Map.MapCellY) y = Map.MapCellY;
-			if (x >= Map.MapCellX + Map.MapCellWidth) x = Map.MapCellX + Map.MapCellWidth - 1;
-			if (y >= Map.MapCellY + Map.MapCellHeight) y = Map.MapCellY + Map.MapCellHeight - 1;
-			cell = XY_Cell(x, y);
+			/*
+			**	If the edge fails, then try to find a cell within the core.
+			*/
+			cell = Random_Cell_In_Zone(ZONE_CORE);
 		}
+	}
+	else {
+		cell = Coord_Cell(coord);
+	}
 
-		// #MinorAIFixes - check if the three cells above the chosen cell contain a Refinery. If so, find another cell.
-		CellClass *cellptr_NW = &Map[(CELL)(cell + AdjacentCell[FACING_NW])];
-		CellClass *cellptr_N = &Map[(CELL)(cell + AdjacentCell[FACING_N])];
-		CellClass *cellptr_NE = &Map[(CELL)(cell + AdjacentCell[FACING_NE])];
-		TechnoClass * tech_NW = cellptr_NW->Cell_Techno_B();
-		TechnoClass * tech_N = cellptr_N->Cell_Techno_B();
-		TechnoClass * tech_NE = cellptr_NE->Cell_Techno_B();
+	/*
+	**	If the randomly picked location is not in the legal map area, then clip it to
+	**	the legal map area.
+	*/
+	if (!Map.In_Radar(cell)) {
+		int x = Cell_X(cell);
+		int y = Cell_Y(cell);
 
-		//Still crashing ??
-		// techno is null? getting called by building placement code?
-		if (tech_NW) {
-			if (tech_NW->What_Am_I() == RTTI_BUILDING && *((BuildingClass*)tech_NW) == STRUCT_REFINERY) {
-				IsUnderRefinery = true;
-				CCDebugString("Random Cell - The NW cell is under a Refinery \n");
-			}
-		}
-		if (tech_N) {
-			if (tech_N->What_Am_I() == RTTI_BUILDING && *((BuildingClass*)tech_N) == STRUCT_REFINERY) {
-				IsUnderRefinery = true;
-				CCDebugString("Random Cell - The N cell is under a Refinery \n");
-			}
-		}
-		if (tech_NE) {
-			if (tech_NE->What_Am_I() == RTTI_BUILDING && *((BuildingClass*)tech_NE) == STRUCT_REFINERY) {
-				IsUnderRefinery = true;
-				CCDebugString("Random Cell - The NE cell is under a Refinery \n");
-			}
-		}
-	} while (IsUnderRefinery != false && !BuildingPlacement);
-
+		if (x < Map.MapCellX) x = Map.MapCellX;
+		if (y < Map.MapCellY) y = Map.MapCellY;
+		if (x >= Map.MapCellX + Map.MapCellWidth) x = Map.MapCellX + Map.MapCellWidth - 1;
+		if (y >= Map.MapCellY + Map.MapCellHeight) y = Map.MapCellY + Map.MapCellHeight - 1;
+		cell = XY_Cell(x, y);
+	}
 	return(cell);
 }
 
@@ -9284,48 +9464,6 @@ void HouseClass::AI_Harvesters(void)
 		}
 		HarvesterTimeCheck = (Frame / (323));
 	}
-	return;
-}
-
-/***********************************************************************************************
- * HouseClass::Shift_Units --  Moves any produced units away from the Factory into a random    *
- * base zone to reduce clogging. This is called from UnitClass:Enter_Idle_Mode when a new      *
- * Unit is created and goes into Idle.                                                         *
- *                                                                                             *
- *			#MinorAIFixes                                                                      *
- *                                                                                             *
- * INPUT:   The Unit to be moved															   *
- *                                                                                             *
- * OUTPUT:  none                                                                               *
- *                                                                                             *
- * WARNINGS:   none                                                                            *
- *                                                                                             *
- * HISTORY:                                                                                    *
- *   20/10/2020 Created.                                                                       *
- *=============================================================================================*/
-void HouseClass::Shift_Units(UnitClass * u)
-{
-	Validate();
-	ZoneType zone_origin;							// The zone that the object is currently in
-	ZoneType zone_destination = ZONE_NONE;			// The zone that the object should go to
-
-	zone_origin = Which_Zone(u);
-	while (zone_destination == zone_origin || zone_destination == ZONE_NONE) {
-		zone_destination = Random_Pick(ZONE_NORTH, ZONE_WEST);			// Pick a random zone that isn't the origin
-	}
-
-	CELL cell = Random_Cell_In_Zone(zone_destination, false);
-
-	// If we're sending units to the midpoint of the map before an attack, then send them straight there. Otherwise shuffle them.
-	if (Enemy != HOUSE_NONE && (rallystatus == SKIRMISH_RALLYING || rallystatus == SKIRMISH_RALLIED)) {
-		CELL rallypoint = GenerateRallyPoint();
-		u->ArchiveTarget = ::As_Target(rallypoint);
-		CCDebugString("Shift_Units - moving Unit to rally point \n");
-	}
-	else {
-		u->ArchiveTarget = ::As_Target(Map.Nearby_Location(cell));
-	}
-	//	u->ArchiveTarget = ::As_Target(Map.Nearby_Location(cell));
 	return;
 }
 
@@ -9464,71 +9602,6 @@ ZoneType HouseClass::Zone_Nearest_Tiberium(void) const
 		}
 	}
 	return(ZONE_NONE);
-}
-
-/***********************************************************************************************
- * HouseClass::GenerateRallyPoint -- Finds a Rally point between two bases                     *
- *                                                                                             *
- *    This is to determine the mid between two bases in order to generate a rally point for    *
- *    attack waves in order to group them up.                                                  *
- *    #MinorAIFixes                                                                            *
- *                                                                                             *
- * INPUT:   none                                                                               *
- *                                                                                             *
- * OUTPUT:  CELL; mid-point between the AI base and the enemy base						       *
- *                                                                                             *
- * WARNINGS:   none                                                                            *
- *                                                                                             *
- * HISTORY:                                                                                    *
- *   10/11/2020  Created.                                                                      *
- *=============================================================================================*/
-CELL HouseClass::GenerateRallyPoint(void)
-{
-	int x;
-	int y;
-	int temp_base;
-	int temp_enemy;
-	CELL cell_base = Coord_Cell(Center);
-
-	HouseClass * h = HouseClass::As_Pointer(Enemy);
-	if (!h->IsActive) {
-		CCDebugString("GenerateRallyPoint - Enemy house allegedly not Active \n");
-	}
-	CELL cell_enemy_base = Coord_Cell(h->Center);
-
-	temp_base = Cell_X(cell_base);
-	temp_enemy = Cell_X(cell_enemy_base);
-
-	if (temp_base == temp_enemy) {
-		x = temp_base;
-	}
-	else {
-		if (temp_base > temp_enemy) {
-			x = temp_enemy + ((temp_base - temp_enemy) / 2);
-		}
-		else {
-			x = temp_base + ((temp_enemy - temp_base) / 2);
-		}
-	}
-	temp_base = Cell_Y(cell_base);
-	temp_enemy = Cell_Y(cell_enemy_base);
-	if (temp_base == temp_enemy) {
-		y = temp_base;
-	}
-	else {
-		if (temp_base > temp_enemy) {
-			y = temp_enemy + ((temp_base - temp_enemy) / 2);
-		}
-		else {
-			y = temp_base + ((temp_enemy - temp_base) / 2);
-		}
-	}
-
-	char var4[256];
-	sprintf(var4, "GenerateRallyPoint - own cell=%d \t enemy cell=%d \t x=%d \t y=%d \t new_x=%d \t new_y=%d \n", cell_base, cell_enemy_base, Cell_X(cell_base), Cell_Y(cell_base), x, y);
-	CCDebugString(var4);
-
-	return(XY_Cell(x, y));
 }
 
 #endif

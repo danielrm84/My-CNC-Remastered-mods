@@ -62,6 +62,11 @@ class FootClass :	public TechnoClass
 		unsigned IsInitiated:1;
 
 		/*
+		** Kerekupai: attack move
+		*/
+		bool attack_move;
+
+		/*
 		**	When the player gives this object a navigation target AND that target
 		**	does not result in any movement of the unit, then a beep should be
 		**	sounded. This typically occurs when selecting an invalid location for

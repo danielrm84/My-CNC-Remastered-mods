@@ -75,6 +75,10 @@ class HouseClass {
 		float RepairDelay;
 		float BuildDelay;
 
+		// Kerekupai: bool variable to control if superweapon has been launched
+		// In campaign, nuke can be used only once
+		bool superweapon_launched;
+
 		/*
 		**	This is the house type that this house object should act like. This
 		**	value controls production choices and radar cover plate imagery.
@@ -571,26 +575,12 @@ class HouseClass {
 		//Kerekupai from #MinorAIFixes
 		virtual void AI_Harvesters(void);
 		int HarvesterTimeCheck = 0;
-		virtual void Shift_Units(UnitClass * u);
 		int Tiberium_Check(CELL &center, int x, int y) const;
 		ZoneType Zone_Nearest_Tiberium(void) const;
-		int Power_Estimate(void);
-		CELL GenerateRallyPoint(void);
-		typedef enum AttackState : unsigned char {
-			SKIRMISH_NONE = 0,
-			SKIRMISH_RALLYING,
-			SKIRMISH_RALLIED,
-			SKIRMISH_ATTACKING,
-			SKIRMISH_COMPLETED
-		} AttackState;
-		AttackState rallystatus = SKIRMISH_COMPLETED;
 		// Kerekupai: end MinorAIFixes mod
 
-		bool Can_Make_Money(void) const { // Kerekupai: the function considers availability of harversters as well
+		bool Can_Make_Money(void) const {
 			return(Available_Money() > 300 || ((BScan & STRUCTF_REFINERY)));
-			//return(Available_Money() > 300 ||
-			//	(BQuantity[STRUCT_REFINERY] >= 1 &&
-			//		UScan & UNITF_HARVESTER));
 		};
 
 		int Expert_AI(void);
@@ -693,6 +683,11 @@ class HouseClass {
 		// Kerekupai: Ai sell some structures to get cash
 		// return true if a structure was sold
 		bool Sell_Some_Structures();
+		/*
+		** Kerekupai: AI uncloak everything
+		**			  Called at end game
+		*/
+		bool Do_Uncloak_All();
 
 		/*
 		** This routine gets called in multiplayer games when every unit, building,
@@ -814,7 +809,8 @@ class HouseClass {
 		**	Tracks number of each building type owned by this house. Even if the
 		**	building is in construction, it will be reflected in this total.
 		*/
-		int BQuantity[STRUCT_COUNT];
+		// Kerkupai: making BQuantity public
+		//int BQuantity[STRUCT_COUNT];
 		int UQuantity[UNIT_COUNT];
 		int IQuantity[INFANTRY_COUNT];
 		int AQuantity[AIRCRAFT_COUNT];
@@ -828,6 +824,10 @@ class HouseClass {
 		TCountDownTimerClass Attack;
 
 	public:
+
+		// Kerkupai: making BQuantity public
+		int BQuantity[STRUCT_COUNT];
+
 		/*
 		**	This records the overriding enemy that the computer will try to
 		**	destroy. Typically, this is the last house to attack, but can be

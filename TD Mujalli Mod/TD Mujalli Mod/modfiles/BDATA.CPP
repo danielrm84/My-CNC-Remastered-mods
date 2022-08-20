@@ -668,7 +668,7 @@ static BuildingTypeClass const ClassRefinery(
 	WEAPON_NONE,WEAPON_NONE,
 	ARMOR_WOOD,								// ARMOR:		Armor type
 	0,											// CANENTER:	Units that can enter building.
-	1000,										// CAPACITY:	Spice storage capacity.
+	2000,	//Kerekupai: def 1000									// CAPACITY:	Spice storage capacity.
 	10,										// POWER:		Power points required.
 	40,										// DRAIN:		Power points required.
 	BSIZE_33, 								// SIZE:			Building size.
@@ -725,7 +725,7 @@ static BuildingTypeClass const ClassStorage(
 	WEAPON_NONE,WEAPON_NONE,
 	ARMOR_WOOD,								// ARMOR:		Armor type
 	0, // kerekupai default 0,				// CANENTER:	Units that can enter building.
-	1500,										// CAPACITY:	Spice storage capacity.
+	2500,	//Kerekupai: def 1500									// CAPACITY:	Spice storage capacity.
 	0,											// POWER:		Power points required.
 	10,										// DRAIN:		Power points required.
 	BSIZE_21, 								// SIZE:			Building size.
@@ -1098,7 +1098,7 @@ static BuildingTypeClass const ClassHospital(
 		false,		// Does building care less if placed on concrete?
 	RTTI_NONE,								// The object type produced at this factory.
 	DIR_N,									// Starting idle frame to match construction.
-	200,										// STRNTH:		Full strength of building.
+	300,	// Kerekupai: default 200			// STRNTH:		Full strength of building.
 	2,											// SIGHTRANGE:	Range of sighting.
 	500,										// COST:			Cost to purchase.
 	2,	// kerekupai									// SCENARIO:	Starting availability scenario.
@@ -2474,7 +2474,7 @@ static BuildingTypeClass const ClassV19(
 		false,		// Theater specific graphic image?
 		false,		// Does it have a rotating turret?
 		false,		// Fires multiple shots in quick succession?
-		false,		// Can it be repaired?
+		true,//false,		// Can it be repaired? // Kerekupai: oil derricks can be repaired by owner
 		false,		// Can it be manufactured by the player?
 		true,			// Does it contain a crew?
 		false,		// Does building care less if placed on concrete?

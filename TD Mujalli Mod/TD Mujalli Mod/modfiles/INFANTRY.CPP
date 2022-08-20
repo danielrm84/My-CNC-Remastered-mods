@@ -259,7 +259,7 @@ InfantryClass::InfantryClass(InfantryType classid, HousesType house) :
 	IsTechnician = false;
 	Strength = Class->MaxStrength;
 	// kerekupai
-	healing_delay = 0.0;
+	//healing_delay = 0.0;
 
 	/*
 	**	Civilians carry much less ammo than soldiers do.
@@ -328,10 +328,10 @@ InfantryClass::~InfantryClass(void)
  * HISTORY:                                                                                    *
  *   11/19/2020 Kerekupai : Created.                                                                 *
  *=============================================================================================*/
-double InfantryClass::get_healing_delay()
+/*double InfantryClass::get_healing_delay()
 {
 	return healing_delay;
-}
+}*/
 
 
 /***********************************************************************************************
@@ -543,6 +543,16 @@ ResultType InfantryClass::Take_Damage(int & damage, int distance, WarheadType wa
 		if (source) {
 			Scatter(c4);
 		}
+
+		/*
+		** Kerekupai: tell wounded engineers to do something! (as done for RA)
+		*/
+		if (!House->IsHuman && *this == INFANTRY_E7 && (Mission == MISSION_GUARD || Mission == MISSION_GUARD_AREA)) {
+			Assign_Mission(MISSION_HUNT);
+		}
+		/*
+		** Kerekupai: end of tell wounded engineers to do something! (as done for RA)
+		*/
 
 #ifdef BOXING
 		if (IsBoxing) {
@@ -1514,30 +1524,40 @@ void InfantryClass::AI(void)
 	}
 
 	// Kerekupai: infantry heals up if a hospital is nearby
-	if (this->Strength < this->Class_Of().MaxStrength) // if hurt
+	if (Strength < Class_Of().MaxStrength) // if hurt
 	{
 		for (int index = 0; index < Buildings.Count(); index++)  // check if hospital nearby
 		{
 			BuildingClass * b = Buildings.Ptr(index);
 
+			//if (b && !b->IsInLimbo && *b == STRUCT_HOSPITAL)
+			//	b->update_healing_state(false);
+
 			if (b && !b->IsInLimbo &&
-				(b->House == this->House || b->House->Is_Ally(this->House)) && // own or ally
+				(b->House == House || b->House->Is_Ally(House) || b->Owner() == HOUSE_NEUTRAL) && // own or ally or neutral
 				*b == STRUCT_HOSPITAL &&
 				!IsFiring && !IsProne && !IsStoked &&	// not engaged in combat
 				(Mission == MISSION_NONE || Mission == MISSION_GUARD ||
-					Mission == MISSION_GUARD_AREA) &&
-				Lepton_To_Cell(Distance_Coord(this->Coord, b->Center_Coord())) <= 3
+					Mission == MISSION_GUARD_AREA) //&&
+				//Lepton_To_Cell(Distance_Coord(Coord, b->Center_Coord())) <= 3
 				)
 			{
-				healing_delay += 0.05;	// healing rate
-				if (get_healing_delay() >= 1.0)
+				if (Lepton_To_Cell(Distance_Coord(Coord, b->Center_Coord())) <= 3)
 				{
-					this->Strength += 1;
-					if (this->Strength > this->Class_Of().MaxStrength)
+					// update the hospital healing state and heal the infantry up at given rate
+					b->update_healing_state(true);
+					if (Frame % 50 == 0)
 					{
-						this->Strength = this->Class_Of().MaxStrength;
+						Strength += 1;
+						if (Strength >= Class_Of().MaxStrength)
+						{
+							Strength = Class_Of().MaxStrength;
+							b->update_healing_state(false);
+						}
 					}
-					healing_delay = 0.0;	// reset counter
+				}
+				else {
+					b->update_healing_state(false);
 				}
 			}
 
@@ -1667,7 +1687,9 @@ MoveType InfantryClass::Can_Enter_Cell(CELL cell, FacingType ) const
 	if (cellptr->Overlay != OVERLAY_NONE) {
 		OverlayTypeClass const & otype = OverlayTypeClass::As_Reference(cellptr->Overlay);
 
-		if (otype.IsCrate && !House->IsHuman) {
+		// Kerekupai: AI can take crates in skirmish
+		//if (otype.IsCrate && !House->IsHuman) {
+		if (otype.IsCrate && GameToPlay == GAME_NORMAL && !House->IsHuman) {
 			return(MOVE_NO);
 		}
 
@@ -3011,8 +3033,8 @@ ActionType InfantryClass::What_Action(ObjectClass * object) const
 			((BuildingClass *)object)->Can_Capture()
 			) 
 		{
-
-			action = ACTION_BACKTOWORK;
+			action = ACTION_CAPTURE;
+			//action = ACTION_BACKTOWORK;
 		}
 		else {
 			if (Class->Primary == WEAPON_NONE) {
@@ -3423,6 +3445,14 @@ int InfantryClass::Mission_Attack(void)
 		Assign_Mission(MISSION_BACKTOWORK);
 		return(1);
 	}
+	// Kerekupai: commando sabotage buildings
+	if (*this == INFANTRY_RAMBO && As_Building(TarCom) && 
+		(FootClass *)this->In_Range(TarCom) && !IsFiring) {
+		Assign_Destination(TarCom);
+		Assign_Mission(MISSION_SABOTAGE);
+		return(1);
+	}
+	// Kerekupai: end of commando sabotage buildings
 
 	return(FootClass::Mission_Attack());
 }

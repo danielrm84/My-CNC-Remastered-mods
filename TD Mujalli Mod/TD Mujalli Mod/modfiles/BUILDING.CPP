@@ -1116,12 +1116,15 @@ void BuildingClass::AI(void)
 		}
 	}
 
-	// Kerekupai: oil derrick gives money
-	if (GameToPlay != GAME_NORMAL &&
-		*this == STRUCT_PUMP &&
-		Frame % 100 == 0) {
-		House->Refund_Money(5);
+	/*
+	** Kerekupai: oil derrick gives money
+	*/
+	if (*this == STRUCT_PUMP && Frame % 330 == 0) {
+		House->Refund_Money(20);
 	}
+	/*
+	** Kerekupai: end of oil derrick gives money
+	*/
 
 	/*
 	**	Handle any production tied to this building. Only computer controlled buildings have
@@ -1173,8 +1176,32 @@ void BuildingClass::AI(void)
 				Repair(1);
 			} else {
 				if (IsTickedOff && (int)Scenario > 2 && Random_Pick(0, 50) < (int)Scenario && !Trigger) {
+					/*
+					** Kerekupai: AI does not sell back damaged buildings unless there is no money
+					**			  (does not sell construction yard, factories, defenses. This is managed by
+					**			   the sell_some_structures function in House.cpp)
+					*/  
 					if (GameToPlay != GAME_NORMAL || Scenario != 15 || PlayerPtr->ActLike != HOUSE_GOOD || *this != STRUCT_TEMPLE) {
-						Sell_Back(1);
+						if (GameToPlay != GAME_NORMAL) {
+							if(this->House->Available_Money() < 50 &&
+								(
+									(Class->IsCaptureable && !Class->IsFactory && *this != STRUCT_REFINERY) ||
+									(*this == STRUCT_REFINERY && House->BQuantity[*this] > 1) ||
+									(Class->IsFactory && House->BQuantity[*this] > 1) ||
+									((*this == STRUCT_OBELISK || *this == STRUCT_ATOWER) && House->Power_Fraction() < 1) ||
+									((*this == STRUCT_GTOWER || *this == STRUCT_TURRET || *this == STRUCT_SAM) && Strength < Class->MaxStrength * 0.2 && Mission != MISSION_ATTACK)
+								)
+							)
+							{
+								Sell_Back(1);
+							}
+						}
+						else {
+							Sell_Back(1);
+						}
+					/*
+					** Kerekupai: end AI does not sell back damaged buildings
+					*/ 
 					}
 				}
 			}
@@ -1851,6 +1878,15 @@ BuildingClass::BuildingClass(StructType type, HousesType house) :
 	Ammo = Class->MaxAmmo;
 
 	/*
+	** Kerekupai: initialization can speak vox repairing
+	*/
+	can_speak_vox_repairing = true;
+	/*
+	** Kerekupai: initialization of is_healing status (used for hospitals)
+	*/
+	is_healing = false;
+
+	/*
 	**	Make sure that newly built house specific building types will act like
 	**	the house they are supposed to act like, regardless of who the current
 	**	owner may happen to be.
@@ -2196,20 +2232,119 @@ int BuildingClass::Exit_Object(TechnoClass * base)
 				if (air->Unlimbo(Docking_Coord(), air->Pose_Dir())) {
 					Transmit_Message(RADIO_HELLO, air);
 					Transmit_Message(RADIO_TETHER);
+
+					/*
+					** Kerekupai: make transport helis find a landing spot near the helipad instead
+					*/
+					if (*air == AIRCRAFT_TRANSPORT && House->IsBaseBuilding)
+					{
+						air->Transmit_Message(RADIO_OVER_OUT);
+						air->Process_Take_Off();
+						BuildingClass * nearest = Find_Docking_Bay(STRUCT_HELIPAD, false);
+						if (nearest) {
+							Assign_Destination(::As_Target(nearest->Nearby_Location(air)));
+							//air->Assign_Mission(MISSION_GUARD_AREA);
+						}else {
+							air->Scatter(0, true);
+						}
+					}
+
+					/*
+					** Kerekupai: end of make transport helis find a landing spot near the helipad instead
+					*/
+
 					ScenarioInit--;
 					return(2);
 				}
 				ScenarioInit--;
-			} else {
-				AircraftClass *air = (AircraftClass *)base;
-
-				if (Cell_X(Coord_Cell(Center_Coord())) - Map.MapCellX < Map.MapCellWidth/2) {
+			}
+			else {
+				AircraftClass * air = (AircraftClass *)base;
+				/*
+				** Kerekupai: helis enter scenario from closest map border to active helipad
+				*/
+				/*if (Cell_X(Coord_Cell(Center_Coord())) - Map.MapCellX < Map.MapCellWidth/2) {
 					cell = XY_Cell(Map.MapCellX-1, Random_Pick(0, Map.MapCellHeight-1)+Map.MapCellY);
 				} else {
 					cell = XY_Cell(Map.MapCellX+Map.MapCellWidth, Random_Pick(0, Map.MapCellHeight-1)+Map.MapCellY);
+				}*/
+				/* EXPLAINING THE MAP AREA
+				** quadrants: 2	1
+				**			  3 4
+				** x and y are located at the top left corner
+				** the value range of cellx is [x, x + max_x]
+				** the value range of celly is [y, y + max_y]
+				*/
+				int max_x = Map.MapCellWidth;
+				int max_y = Map.MapCellHeight;
+				int x = Map.MapCellX;
+				int y = Map.MapCellY;
+				int pad_x = Cell_X(Coord_Cell(Center_Coord())); // x coord from helipad
+				int pad_y = Cell_Y(Coord_Cell(Center_Coord()));
+				int enter_x = 0; // coord to enter the map
+				int enter_y = 0;
+				DirType dir;	 // desired facing
+
+				// check the quadrant and assign as entering coord the closest coord to pad
+				if (pad_x > (x + max_x) / 2) { // right (1st or 4th quadrant)
+
+					if (pad_y < (y + max_y) / 2) { // if Quadrant 1
+						if (unsigned((x + max_x) - pad_x) < unsigned(pad_y)) {
+							enter_x = x + max_x;
+							enter_y = pad_y;
+							dir = DIR_W;
+						}
+						else {
+							enter_x = pad_x;
+							enter_y = y;
+							dir = DIR_S;
+						}
+					}
+					else { // if Quadrant 4
+						if (unsigned((x + max_x) - pad_x) < unsigned((y + max_y) - pad_y)) {
+							enter_x = x + max_x;
+							enter_y = pad_y;
+							dir = DIR_W;
+						}
+						else {
+							enter_x = pad_x;
+							enter_y = y + max_y;
+							dir = DIR_N;
+						}
+					}
 				}
+				else {
+					if (pad_y < (y + max_y) / 2) { // if Quadrant 2
+						if (pad_x < pad_y) {
+							enter_x = x;
+							enter_y = pad_y;
+							dir = DIR_E;
+						}
+						else {
+							enter_x = pad_x;
+							enter_y = y;
+							dir = DIR_S;
+						}
+					}
+					else { // if Quadrant 3
+						if (unsigned(pad_x) < unsigned((y + max_y) - pad_y)) {
+							enter_x = x;
+							enter_y = pad_y;
+							dir = DIR_E;
+						}
+						else {
+							enter_x = pad_x;
+							enter_y = y + max_y;
+							dir = DIR_N;
+						}
+					}
+				}
+				// Assign the enter coordinates
+				cell = XY_Cell(enter_x, enter_y);
+
 				ScenarioInit++;
-				if (air->Unlimbo(Cell_Coord(cell), DIR_N)) {
+				//if (air->Unlimbo(Cell_Coord(cell), DIR_N)) {
+				if (air->Unlimbo(Cell_Coord(cell), dir)) {
 					air->Assign_Destination(::As_Target(Nearby_Location(air)));
 					air->Assign_Mission(MISSION_MOVE);
 					ScenarioInit--;
@@ -2217,6 +2352,10 @@ int BuildingClass::Exit_Object(TechnoClass * base)
 				}
 				ScenarioInit--;
 			}
+			/*
+			** Kerekupai: end of helis enter scenario from closest map border to active helipad
+			*/
+
 			break;
 
 		case RTTI_INFANTRY:
@@ -2261,6 +2400,18 @@ int BuildingClass::Exit_Object(TechnoClass * base)
 						Transmit_Message(RADIO_HELLO, base);
 						Transmit_Message(RADIO_TETHER);
 						Assign_Mission(MISSION_UNLOAD);
+
+						/*
+						** Kerekupai: from RA: set unit to defend base in skirmish
+						*/
+						if (!House->IsHuman && House->IsBaseBuilding) {// House->IQ >= Rule.IQGuardArea)
+							base->Assign_Mission(MISSION_GUARD_AREA);
+							base->ArchiveTarget = ::As_Target(House->Where_To_Go((FootClass *)base));
+						}
+						/*
+						** Kerekupai: end of from RA: set unit to defend base in skirmish
+						*/
+
 						ScenarioInit--;
 						return(2);
 					}
@@ -2298,6 +2449,17 @@ int BuildingClass::Exit_Object(TechnoClass * base)
 
 							base->Assign_Mission(MISSION_MOVE);
 							base->Assign_Destination(::As_Target(cell));
+
+							/*
+							** Kerekupai: from RA: set unit to defend base in skirmish
+							*/
+							if (!House->IsHuman && House->IsBaseBuilding){// House->IQ >= Rule.IQGuardArea)
+								base->Assign_Mission(MISSION_GUARD_AREA);
+								base->ArchiveTarget = ::As_Target(House->Where_To_Go((FootClass *)base));
+							}
+							/*
+							** Kerekupai: end of from RA: set unit to defend base in skirmish
+							*/
 
 							/*
 							**	Establish radio contact so unload coordination can occur. This
@@ -4608,6 +4770,11 @@ int BuildingClass::Mission_Repair(void)
 			case IDLE:
 				if (!In_Radio_Contact()) {
 					Assign_Mission(MISSION_GUARD);
+					/*
+					** Kerekupai: repair bay speaks voice repairing only once
+					**			  When idle, can_speak = true
+					*/
+					can_speak_vox_repairing = true;
 					return(1);
 				}
 
@@ -4616,15 +4783,35 @@ int BuildingClass::Mission_Repair(void)
 
 						// MBL 07.06.2020 - Patch 3: Change to TD Legacy: Adding "Repairing" VO for units on repair bay
 						// Per https://jaas.ea.com/browse/TDRA-7271
-						if (IsOwnedByPlayer && House) Speak(VOX_REPAIRING, House);
+						if (IsOwnedByPlayer && House && can_speak_vox_repairing)
+						{
+							Speak(VOX_REPAIRING, House);
+							can_speak_vox_repairing = false;
+						}
 
 						Status = DURING;
 						Begin_Mode(BSTATE_ACTIVE);
 						IsReadyToCommence = false;
-					} else {
-						if (!House->IsHuman) {
-							Transmit_Message(RADIO_RUN_AWAY);
+					} else {	
+						/*
+						** Kerekupai: units exit repair facility when full health
+						*/
+						if (Contact_With_Whom()->What_Am_I() == RTTI_UNIT &&
+							((UnitClass *)Contact_With_Whom())->Strength >= ((UnitClass *)Contact_With_Whom())->Class->MaxStrength
+							)
+						{
+							if (*((UnitClass *)Contact_With_Whom()) == UNIT_HARVESTER && MissionQueue != MISSION_NONE) {
+								((UnitClass *)Contact_With_Whom())->Transmit_Message(RADIO_OVER_OUT);
+							}
+							else {
+								Transmit_Message(RADIO_RUN_AWAY);
+
+							}
 						}
+						/*
+						** Kerekupai: end of units exit repair facility when full health
+						*/
+						if (!House->IsHuman) { Transmit_Message(RADIO_RUN_AWAY); }
 					}
 //				} else {
 //					Assign_Mission(MISSION_GUARD);
@@ -4649,6 +4836,25 @@ int BuildingClass::Mission_Repair(void)
 #endif
 						Begin_Mode(BSTATE_IDLE);
 						Status = IDLE;
+
+						/*
+						** Kerekupai: units exit repair facility when full health
+						*/
+						if (Contact_With_Whom()->What_Am_I() == RTTI_UNIT && 
+							((UnitClass *)Contact_With_Whom())->Strength >= ((UnitClass *)Contact_With_Whom())->Class->MaxStrength
+							)
+						{
+							if (*((UnitClass *)Contact_With_Whom()) == UNIT_HARVESTER && MissionQueue != MISSION_NONE) {
+								((UnitClass *)Contact_With_Whom())->Transmit_Message(RADIO_OVER_OUT);
+							}
+							else {
+								Transmit_Message(RADIO_RUN_AWAY);
+
+							}
+						}
+						/*
+						** Kerekupai: end of units exit repair facility when full health
+						*/
 #ifdef OBSOLETE
 					} else {
 						int time = Bound(Fixed_To_Cardinal(TICKS_PER_SECOND, House->Power_Fraction()), 0, TICKS_PER_SECOND);
@@ -5545,4 +5751,41 @@ bool BuildingClass::Passes_Proximity_Check(CELL homecell)
 		}
 	}
 	return(false);
+}
+
+/***********************************************************************************************
+ * BuildingClass::update_healing_state -- Update the healing state of the building             *
+ *                                                                                             *
+ *    This routine is intended only for hospitals to keep track of their healing state		   *
+ *    If the hospital is healing infantry, then it will take true as argument				   *
+ *                                                                                             *
+ * INPUT:   bool -- Is the hospital currently healing infantry							       *
+ *                                                                                             *
+ * OUTPUT:  None																		       *
+ *                                                                                             *
+ * WARNINGS:   None										                                       *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   20/Aug/2022 Kerekupai : Created.                                                          *
+ *=============================================================================================*/
+void BuildingClass::update_healing_state(bool state) {
+	is_healing = state;
+}
+
+/***********************************************************************************************
+ * BuildingClass::get_healing_state -- get the healing state of the building	               *
+ *                                                                                             *
+ *    This routine is intended only for hospitals to keep track of their healing state		   *
+ *                                                                                             *
+ * INPUT:   None																		       *
+ *                                                                                             *
+ * OUTPUT:  bool -- true if the hospital is currently healing infantry					       *
+ *                                                                                             *
+ * WARNINGS:   None										                                       *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   20/Aug/2022 Kerekupai : Created.                                                          *
+ *=============================================================================================*/
+bool  BuildingClass::get_healing_state() {
+	return (is_healing);
 }

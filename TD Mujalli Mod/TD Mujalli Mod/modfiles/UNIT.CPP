@@ -600,8 +600,10 @@ RadioMessageType UnitClass::Receive_Message(RadioClass * from, RadioMessageType 
 		/*
 		**	Asks if the passenger can load on this transport.
 		*/
+		// Kerekupai: Allies unit can load on this transport
 		case RADIO_CAN_LOAD:
-			if (Class->IsTransporter && How_Many() < Class->Max_Passengers() && from && House->Class->House == from->Owner()) {
+			if (Class->IsTransporter && How_Many() < Class->Max_Passengers() && from && 
+				(House->Class->House == from->Owner() || House->Is_Ally(from->Owner()))) {
 				return(RADIO_ROGER);
 			}
 			return(RADIO_NEGATIVE);
@@ -1019,7 +1021,7 @@ ResultType UnitClass::Take_Damage(int & damage, int distance, WarheadType warhea
 		**	Possibly have the crew member run away.
 		*/
 		Mark(MARK_UP);
-		if (Class->IsCrew && !Class->IsTransporter) {
+		if (Class->IsCrew && !Class->IsTransporter){ // Kerekupai: jeep and buggy transport units
 			if (Random_Pick(0, 1) == 0) {
 				InfantryClass * i = 0;
 				if (Class->Primary == WEAPON_NONE) {
@@ -1121,8 +1123,13 @@ ResultType UnitClass::Take_Damage(int & damage, int distance, WarheadType warhea
 			**	player. In hard mode, they always do. In normal mode, they only overrun past
 			**	mission #8.
 			*/
-			if ((Class->Primary == WEAPON_NONE || (Distance(source) < 0x0180 && BulletTypeClass::As_Reference(Weapons[Class->Primary].Fires).Warhead != WARHEAD_FIRE)) &&
+
+			/*
+			** Kerekupai: havester doesnt try to crush
+			*/
+			if (((Class->Primary == WEAPON_NONE && *this != UNIT_HARVESTER) || (*this != UNIT_HARVESTER && Distance(source) < 0x0180 && BulletTypeClass::As_Reference(Weapons[Class->Primary].Fires).Warhead != WARHEAD_FIRE)) &&
 						(GameToPlay != GAME_NORMAL ||
+							
 						*this != UNIT_HARVESTER ||
 						BuildLevel > 8 ||
 						PlayerPtr->Difficulty == DIFF_HARD) &&
@@ -1401,63 +1408,64 @@ void UnitClass::Enter_Idle_Mode(bool initial)
 			if (!In_Radio_Contact() && Mission != MISSION_HARVEST) {
 				if (initial || !House->IsHuman || Map[Coord_Cell(Coord)].Land_Type() == LAND_TIBERIUM) {
 					order = MISSION_HARVEST;
-				} else {
+				}
+				else {
 					order = MISSION_GUARD;
 				}
 				Assign_Target(TARGET_NONE);
 				Assign_Destination(TARGET_NONE);
-			} else {
+			}
+			else {
 				return;
 			}
-		} else {
+		}
+		else {
 			if (IsALoaner && Class->IsTransporter && Is_Something_Attached() && !Team) {
 				order = MISSION_UNLOAD;
-			} else {
+			}
+			else {
 				order = MISSION_GUARD;
 				Assign_Target(TARGET_NONE);
 				Assign_Destination(TARGET_NONE);
 			}
 		}
-	} else {
+	}
+	else {
 		if (Target_Legal(TarCom)) {
 			order = MISSION_ATTACK;
-		} else {
+		}
+		else {
 			if (Target_Legal(NavCom)) {
 				order = MISSION_MOVE;
-			} else {
+			}
+			else {
 				if (GameToPlay == GAME_NORMAL || House->IsHuman) {
 					order = MISSION_GUARD;
-				} else {
+				}
+				else {
 					//if (GameToPlay != GAME_NORMAL) {
 #ifndef USE_RA_AI
 						// Don't use MISSION_TIMED_HUNT since this can trigger the Blitz behavior
-						order = MISSION_TIMED_HUNT;
+					order = MISSION_TIMED_HUNT;
 #else
 						//
 						// Added for RA AI in TD. ST - 7/26/2019 9:12AM
 						//
 						// This applies only to non-human houses in a non-normal game type
 						//
-						
-						// Kerekupai: from MinorAiFixes
-						if (initial && Frame > 1000) {
-							CCDebugString("We found a unit in it's Initial state, telling it to shuffle.\n");
-							House->Shift_Units(this);
-						}
+					order = MISSION_GUARD;
 
-						order = MISSION_GUARD;
+					if (Mission == MISSION_GUARD || Mission == MISSION_GUARD_AREA) {
+						return;
+					}
 
-						if (Mission == MISSION_GUARD || Mission == MISSION_GUARD_AREA) {
-							return;
-						}
-
-						if (!Team) {
-							if (House->IQ >= Rule.IQGuardArea) {
-								if (Is_Weapon_Equipped()) {
-									order = MISSION_GUARD_AREA;
-								}
+					if (!Team) {
+						if (House->IQ >= Rule.IQGuardArea) {
+							if (Is_Weapon_Equipped()) {
+								order = MISSION_GUARD_AREA;
 							}
 						}
+					}
 
 #endif
 					//} else {
@@ -2499,6 +2507,24 @@ bool UnitClass::Goto_Tiberium(void)
 
 BuildingClass* UnitClass::Find_Best_Refinery(void) const
 {
+
+	/*
+	** Kerekupai: try first a closer refinery
+	*/
+	
+	BuildingClass * nearest = Find_Docking_Bay(STRUCT_REFINERY, false);
+	if (nearest != NULL && TiberiumUnloadRefinery != NULL &&
+		nearest != TiberiumUnloadRefinery &&
+		Distance(nearest) < Distance(TiberiumUnloadRefinery) &&
+		!nearest->In_Radio_Contact())
+	{
+		TiberiumUnloadRefinery = nearest;
+	}
+	
+	/*
+	** Kerekupai: try first a closer refinery
+	*/
+	
 	/*
 	**	Remember our last refinery and prefer that one, if still available and valid.
 	*/
@@ -2607,100 +2633,6 @@ int UnitClass::Mission_Unload(void)
 	CELL		cell;
 
 	switch (Class->Type) {
-		// Kerekupai Jeep Buggy transport units
-		case UNIT_JEEP:
-		case UNIT_BUGGY:
-			switch (Status) {
-			case INITIAL_CHECK:
-				dir = Desired_Load_Dir(NULL, cell);
-				if (How_Many() && cell != 0) {
-					Do_Turn(dir);
-					Status = MANEUVERING;
-					return(1);
-				}
-				else {
-					Assign_Mission(MISSION_GUARD);
-				}
-				break;
-
-			case MANEUVERING:
-				if (!IsRotating) {
-					Status = UNLOADING;
-					//APC_Open_Door();
-					//if (Is_Door_Opening()) {
-						//Status = OPENING_DOOR;
-						//return(1);
-					//}
-				}
-				break;
-
-			case OPENING_DOOR:
-				//if (Is_Door_Open()) {
-					//Status = UNLOADING;
-					//return(1);
-				//}
-				//else {
-				//	if (!Is_Door_Opening()) {
-					//	Status = INITIAL_CHECK;
-				//	}
-				//}
-				break;
-
-			case UNLOADING:
-				if (How_Many()) {
-					FootClass * passenger = Detach_Object();
-
-					if (passenger) {
-						DirType toface = DIR_S + PrimaryFacing;
-						bool placed = false;
-
-						for (FacingType face = FACING_N; face < FACING_COUNT; face++) {
-							DirType newface = toface + face;
-							CELL newcell = Adjacent_Cell(Coord_Cell(Coord), newface);
-
-							if (passenger->Can_Enter_Cell(newcell) == MOVE_OK) {
-								ScenarioInit++;
-								passenger->Unlimbo(Coord_Move(Coord, newface, 0x0080), newface);
-								ScenarioInit--;
-								passenger->Assign_Mission(MISSION_MOVE);
-								passenger->Assign_Destination(::As_Target(newcell));
-								placed = true;
-								break;
-							}
-						}
-
-						/*
-						** If the attached unit could NOT be deployed, then re-attach
-						**	it and then bail out of this deploy process.
-						*/
-						if (!placed) {
-							Attach(passenger);
-							Status = CLOSING_DOOR;
-						}
-						else {
-							passenger->Look(false);
-						}
-					}
-				}
-				else {
-					Status = CLOSING_DOOR;
-				}
-				break;
-
-				/*
-				**	Close APC door in preparation for normal operation.
-				*/
-			case CLOSING_DOOR:
-				//if (Is_Door_Open()) {
-				//	APC_Close_Door();
-				//}
-				//if (Is_Door_Closed()) {
-					Assign_Mission(MISSION_GUARD);
-				//}
-				break;
-			}
-			break;
-			// Kerekupai End jeep buggy enter unload
 		case UNIT_APC:
 			switch (Status) {
 				case INITIAL_CHECK:
@@ -2754,6 +2686,14 @@ int UnitClass::Mission_Unload(void)
 									passenger->Assign_Mission(MISSION_MOVE);
 									passenger->Assign_Destination(::As_Target(newcell));
 									placed = true;
+									/*
+									** Kerekupai: AI APC passengers unload and start mission hunt
+									*/
+									if (!House->IsHuman && (passenger->Is_Weapon_Equipped() || ((InfantryTypeClass *)passenger)->IsCapture))
+										passenger->Assign_Mission(MISSION_HUNT);
+									/*
+									** Kerekupai: end of AI APC passengers unload and start mission hunt
+									*/
 									break;
 								}
 							}
@@ -2853,6 +2793,101 @@ int UnitClass::Mission_Unload(void)
 					break;
 			}
 			break;
+
+			// Kerekupai Jeep Buggy transport units
+		case UNIT_JEEP:
+		case UNIT_BUGGY:
+			switch (Status) {
+			case INITIAL_CHECK:
+				dir = Desired_Load_Dir(NULL, cell);
+				if (How_Many() && cell != 0) {
+					Do_Turn(dir);
+					Status = MANEUVERING;
+					return(1);
+				}
+				else {
+					Assign_Mission(MISSION_GUARD);
+				}
+				break;
+
+			case MANEUVERING:
+				if (!IsRotating) {
+					Status = UNLOADING;
+					//APC_Open_Door();
+					//if (Is_Door_Opening()) {
+						//Status = OPENING_DOOR;
+						//return(1);
+					//}
+				}
+				break;
+
+			case OPENING_DOOR:
+				//if (Is_Door_Open()) {
+					//Status = UNLOADING;
+					//return(1);
+				//}
+				//else {
+				//	if (!Is_Door_Opening()) {
+					//	Status = INITIAL_CHECK;
+				//	}
+				//}
+				break;
+
+			case UNLOADING:
+				if (How_Many()) {
+					FootClass * passenger = Detach_Object();
+
+					if (passenger) {
+						DirType toface = DIR_S + PrimaryFacing;
+						bool placed = false;
+
+						for (FacingType face = FACING_N; face < FACING_COUNT; face++) {
+							DirType newface = toface + face;
+							CELL newcell = Adjacent_Cell(Coord_Cell(Coord), newface);
+
+							if (passenger->Can_Enter_Cell(newcell) == MOVE_OK) {
+								ScenarioInit++;
+								passenger->Unlimbo(Coord_Move(Coord, newface, 0x0080), newface);
+								ScenarioInit--;
+								passenger->Assign_Mission(MISSION_MOVE);
+								passenger->Assign_Destination(::As_Target(newcell));
+								placed = true;
+								break;
+							}
+						}
+
+						/*
+						** If the attached unit could NOT be deployed, then re-attach
+						**	it and then bail out of this deploy process.
+						*/
+						if (!placed) {
+							Attach(passenger);
+							Status = CLOSING_DOOR;
+						}
+						else {
+							passenger->Look(false);
+						}
+					}
+				}
+				else {
+					Status = CLOSING_DOOR;
+				}
+				break;
+
+				/*
+				**	Close APC door in preparation for normal operation.
+				*/
+			case CLOSING_DOOR:
+				//if (Is_Door_Open()) {
+				//	APC_Close_Door();
+				//}
+				//if (Is_Door_Closed()) {
+				Assign_Mission(MISSION_GUARD);
+				//}
+				break;
+			}
+			break;
+			// Kerekupai End jeep buggy enter unload
 	}
 	return(TICKS_PER_SECOND);
 }
@@ -2979,12 +3014,71 @@ int UnitClass::Mission_Harvest(void)
 				if (nearest && Transmit_Message(RADIO_HELLO, nearest) == RADIO_ROGER) {
 					Status = HEADINGHOME;
 				} else {
-					ScenarioInit++;
-					nearest = Find_Best_Refinery();
-					ScenarioInit--;
-					if (nearest) {
-						Assign_Destination(::As_Target(nearest->Nearby_Location(this)));
+					//ScenarioInit++;
+					/*
+					** Kerekupai: Smart harversters
+					**			  Harvester tries another refinery, if the preferred one is busy
+					**			  if the alternative refinery is nearby (in radius of 10 cells)
+					*/
+					nearest = NULL;
+					for (int index = 0; index < Buildings.Count(); index++) {
+						BuildingClass * alternative_refinery = Buildings.Ptr(index);
+
+						/*
+						**	Check to see if the building qualifies (preliminary scan).
+						*/
+						if (alternative_refinery != NULL && TiberiumUnloadRefinery != NULL &&
+							!alternative_refinery->IsInLimbo &&
+							*alternative_refinery == STRUCT_REFINERY && alternative_refinery->House == House &&
+							//alternative_refinery != TiberiumUnloadRefinery &&
+							!alternative_refinery->Is_Something_Attached() &&
+							!alternative_refinery->In_Radio_Contact() &&
+							(alternative_refinery->Distance(TiberiumUnloadRefinery) < 10 * CELL_LEPTON_W)
+							//((TechnoClass *)this)->Transmit_Message(RADIO_CAN_LOAD, alternative_refinery) == RADIO_ROGER
+							)
+						{
+							nearest = alternative_refinery;
+							break;
+						}
 					}
+					if (nearest == NULL)
+					{
+						ScenarioInit++;
+						nearest = Find_Best_Refinery();
+						ScenarioInit--;
+						if (nearest) {
+							/*
+							** Kerekupai: haversters skip the line
+							*/
+							
+							if (Transmit_Message(RADIO_HELLO, nearest) == RADIO_ROGER)
+							{
+								Status = HEADINGHOME;
+							}
+							/*
+							** Kerekupai: end of haversters skip the line
+							*/
+							else {
+								Assign_Destination(::As_Target(nearest->Nearby_Location(this)));
+							}
+						}
+					}
+					else {
+						TiberiumUnloadRefinery = nearest;
+						//nearest = Find_Best_Refinery();
+						//Assign_Destination(nearest->As_Target());
+						Status = HEADINGHOME;
+					}
+					/*
+					** Kerekupai: end of smart harversters
+					*/
+					
+					//nearest = Find_Best_Refinery();
+					//ScenarioInit--;
+					//if (nearest) {
+					//	Assign_Destination(::As_Target(nearest->Nearby_Location(this)));
+					//}
+					
 				}
 			}
 			break;
@@ -3331,7 +3425,9 @@ MoveType UnitClass::Can_Enter_Cell(CELL cell, FacingType ) const
 	if (cellptr->Overlay != OVERLAY_NONE) {
 		OverlayTypeClass const * optr = &OverlayTypeClass::As_Reference(cellptr->Overlay);
 
-		if (optr->IsCrate && !House->IsHuman) {
+		// Kerekupai: AI can take crates in skirmish
+		//if (optr->IsCrate && !House->IsHuman) {
+		if (optr->IsCrate && GameToPlay == GAME_NORMAL && !House->IsHuman) {
 			return(MOVE_NO);
 		}
 
@@ -3906,10 +4002,15 @@ ActionType UnitClass::What_Action(ObjectClass * object) const
 	/*
 	**	Special return to friendly repair factory action.
 	*/
-	if (Is_Owned_By_Player() && House->Class->House == object->Owner() && action == ACTION_SELECT && object->What_Am_I() == RTTI_BUILDING) {
+	// Kerekupai: allies can use repair depot
+	if (Is_Owned_By_Player() && 
+		(House->Class->House == object->Owner() || House->Is_Ally(object->Owner())) && 
+		//action == ACTION_SELECT && // kerekupai commented out
+		object->What_Am_I() == RTTI_BUILDING) {
 		BuildingClass * building = (BuildingClass *)object;
 		if (building->Class->Type == STRUCT_REPAIR && !building->In_Radio_Contact() && !building->Is_Something_Attached()) {
-			action = ACTION_MOVE;
+			//action = ACTION_MOVE; // Kerekupai: default value
+			action = ACTION_ENTER; // Kerekupai: mod value allies use repair depot
 		}
 	}
 

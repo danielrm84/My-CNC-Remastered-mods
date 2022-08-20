@@ -192,6 +192,12 @@ class BuildingClass : public TechnoClass
 		int  Power_Output(void) const;
 
 		/*
+		** Kerekupai: update and report the healing status
+		*/
+		void update_healing_state(bool state);
+		bool get_healing_state();
+
+		/*
 		**	Coordinate inquiry functions. These are used for both display and
 		**	combat purposes.
 		*/
@@ -304,6 +310,17 @@ class BuildingClass : public TechnoClass
 		** This contains the value of the Virtual Function Table Pointer
 		*/
 		static void * VTable;
+
+		/*
+		** Kerekupai: variable to control frequency of speaking voice repairing
+		*/
+		bool can_speak_vox_repairing;
+
+		/*
+		** Kerekupai: healing status of hospitals
+		*/
+		bool is_healing;
+		
 };
 
 #endif

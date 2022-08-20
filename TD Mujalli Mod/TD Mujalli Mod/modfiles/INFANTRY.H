@@ -97,7 +97,7 @@ class InfantryClass : public FootClass
 		unsigned	IsBoxing:1;
 
 		/* Kerekupai: healing delay of hospital buildings					*/
-		double healing_delay;
+		//double healing_delay;
 
 		/*
 		** Track when movement last stopped.
@@ -128,8 +128,8 @@ class InfantryClass : public FootClass
 		virtual void Assign_Destination(TARGET);
 
 		// Kerekupai: get healing delay
-		double get_healing_delay();
-
+		//double get_healing_delay();
+		
 		/*
 		**	Query functions.
 		*/
