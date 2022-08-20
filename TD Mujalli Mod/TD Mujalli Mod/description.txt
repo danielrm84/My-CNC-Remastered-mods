@@ -1,0 +1,230 @@
+Hello commanders!
+
+There is a RA version of this mod as well.
+
+What does this mod do?
+
+In this mod, the AI builds
+- silos
+- repair depot
+- base defenses
+- super weapons
+- all units (including commandos)
+- AI building priorities reworked
+- when building, AI randomly selects among structures of similar priority (this adds a bit of variation to the early game)
+- AI repairs damaged buildings
+- AI captures oil derricks
+- AI takes goodies (crates) (skirmish only)
+- AI will sell captured structures that are not factories
+- AI transport vehicles load up infantry
+- there are some tweaks (e.g., units scaling) to make the AI a bit more challenging
+
+In addition
+- enables the creation of hospitals to heal up infantry units (hospitals display icon when healing infantry)
+- minigunner, flame and chemical warrior fire range slightly increased
+- jeep and buggy can transport one infantry unit
+- missile launcher MLRS and mobile SAM have rotary turret
+- technicians can go back to work (ctrl + click on building).
+- engineers can capture oil derricks for cash over time (20 cash units every ~10 seconds under normal speed)
+  Icon colour information:
+  green: own by player
+  red: own by enemy
+  grey: neutral
+- engineers will not move after an attack command on unit targets
+- AI is more responsive to base attack (including attacks to base defenses)
+- AI units will have a preference to attack those enemies wandering outside their home
+- AI units will scatter around base to guard the area
+- AI creates additional helis / orcas units
+- AI engineers will go hunting if injured (as done for RA)
+- AI passengers that unload from transports, start hunting
+- AI commando sabotage enemy buildings
+- units gain experience in combat (see details below)
+- helis and orca enter the map from closest map border to their helipad
+- helis perform guard mode (press "G" when heli is hovering, otherwise it will return to base)
+- helis return to helipads after repairs
+- helis will not fly towards targets if there is no ammo
+- helis will hunt for targets, within certain range, until ammo is depleted (press X, scatter, to break attack mission)
+- innactive helis without ammo will find an available helipad to reload
+- tanks exit repair facility when full health
+- smart harversters: harversters skip the line, prefer nearest refinery (if available), and unload at alternative
+  refineries, when the preferred one is busy
+- attack while moving (shift + move order)
+
+BALANCE CHANGES
+- dark map area will not autoreveal when enemies fire their weapon
+- units belonging to the human player can no longer attack unrevealed enemy units
+- driving speed was reduced for missile launcher MLRS and mobile SAM
+- range was increased for missile launcher MLRS and nod artillery
+
+FEATURES FROM OTHER MODS
+- includes the immersive-helis mod (check it out for more information on what it does)
+IMPORTANT!! Immersive helis: press the key "LEFT ALT" for landing
+- the 1-tile gap for building construction (made by FluffyQuack, many thanks!)
+- hospital icon from Mikeagan (present in old mod version)
+- AI units respond to nearby threats while moving towards a target (modified from screaming_chicken, MinorAiFixes mod)
+- AI Unit waves use 90% of all available Units, not 75% (modified from MinorAiFixes mod)
+- harvesters try to backup one cell if they're stuck for 10 seconds (from screaming_chicken, MinorAiFixes mod)
+- AI won't spread units/infantry onto cells immediately below Refineries (from screaming_chicken, MinorAiFixes mod)
+- AI builds Refineries in the base quadrants(Zones) nearest Tiberium (from screaming_chicken, MinorAiFixes mod)
+
+ENHANCED COOP EXPERIENCE
+- player units can load on ally transports
+- player vehicles can use ally repair depots for repairs
+- immersive helis compatible with LAN games with friends
+
+( Remember that it is possible to play with friends using mods via LAN / VPN )
+
+COMPATIBILITY
+- Compatible with both, campaign and skirmish.
+- This is a *.dll file mod. Remember that one can have only one *.dll mod active at a time
+
+OPTIONAL:
+Personally, I like playing this mod along my TD color mod (check it out in case you want to try it as well). They are fully compatible.
+
+UNITS GAIN EXPERIENCE IN COMBAT
+- Units engaged in combat against the enemy house have a probability of increasing either, their firepower, rate of fire or armor (friendly fire does not affect experience). The selection among these three skills is random. Thus, there can occur specialist units (e.g., they are expert only in firepower), or generalist units. Generalist units cannot be experts in all skills. Units can increase experience up to a maximum of five levels.
+- This probability depends on the cost of the unit. The more expensive, the lower the probability value
+- There is no health regeneration for veteran units. Remember that soldiers can heal up at hospitals
+
+ICON COLOR EXPLAINED:
+- yellow --> rate of fire (RoF)
+- blue --> armor
+- red --> fire power (fpower)
+
+Already present in-game audio (SONAR) will play every time a unit gains experience
+
+KNOWN ISSUES:
+- The mod does not work on saved games that were created without this mod active
+
+Please, let me know if you spot some issues.
+
+Many thanks in advance for the support!! Have fun commanders!
+
+MANY THANKS to
+
+- Thel 'Vadam (Flippy) for sharing AI mod files. They helped me a lot to find my way for the AI in this mod.
+
+- FluffyQuack, for his code on the 1-tile gap for building construction
+
+- Mikeagan for the nice hospital icon (old mod versions)
+
+- Screaming_chicken for the MinorAiFixes!
+
+- to the CFE team for their material that was very helpful to understand how to bring custom icons into the game
+
+TO MODDERS
+
+All my mods are available at:
+https://github.com/danielrm84/My-CNC-Remastered-mods
+
+Please, give the corresponding credits. Many thanks in advance!
+
+Please make mod files public so we all can enjoy the game with our favorite mods working simultaneously
+
+DEDICATION
+In memory of Luis Enrique Diaz who liked to beat every mission without losing a single man 
+(of course, taking advantage of the wall trick :P ) 
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Changelog
+
+20_08_2022
+- fix: transport helicopters in skirmish sometimes not delivering cargo
+- fix: units leaving repair depot when low cash and not full health
+- hospital icon displaying healing state
+- oil derrick icons
+
+
+31_07_2022
+- (fix) units get promoted when fighting enemy house only
+- AI units will have a preference to attack those enemies wandering outside their home
+- AI units will scatter around base to guard the area
+- AI creates additional helis / orcas units
+- dark map area will not autoreveal when enemies fire their weapon
+- units belonging to the human player can no longer attack unrevealed enemy units
+- missile launcher MLRS and mobile SAM have rotary turret
+- driving speed was reduced for missile launcher MLRS and mobile SAM
+- range was increased for missile launcher MLRS and nod artillery
+- plus some other small tweaks to AI attack and hunting behavior
+
+
+26_07_2022
+- Smart harversters: harversters skip the line, prefer nearest refinery (if available), and unload at alternative
+  refineries, when the preferred one is busy
+- AI is more responsive to base attack
+- Innactive helis without ammo will find an available helipad to reload
+- AI passengers that unload from transports, start hunting
+
+
+
+...
+
+changelog < 20.07.2022 no longer present
+
+
+16_07_2022
+- already present in-game sound added to indicate an increase in the experience of the unit
+- AI building priorities reworked
+- AI hunting behavior reworked (fix issue with units sometimes getting stuck in their animation)
+- flame / chemical warrior weapon range slightly increase
+- game rules adjusted
+
+08_07_2022
+-  Icons added to show the experience and specialization of the unit
+- Engineer will go hunting if under attack (as in RA)
+- Harvesters will not try to crush infantry
+
+26_06_2022
+- AI helis will search for targets on tiberium fields (requested by Mike)
+- AI helis search for targets at longer distance (requested by Mike)
+- helis guard area behavior fixed: helis will target any threat nearby
+
+19_06_2022
+- AI transport vehicles load up infantry (similar to RA)
+- target priorities of helis under guard mode slightly modified
+
+10_06_2022
+- helis return to their helipad after repairs
+- navigation of group of helis was adjusted
+- helis: key for landing changed to left alt
+- tanks exit repair facility when full health
+- multiplier factor for veterancy slightly increased
+- helis perform guard mode
+- display icon for technicians going back to work
+- oil derricks cash value increased to 20
+- attack while moving (shift + move order)
+- new hospital icon
+
+...
+
+changelog < 2022 no longer present
+
+
+16_05_2021
+- AI can use the nuke only once in single player campaign
+- player playing as NOD can use the nuke more than once (your decision! :P ) 
+
+28_01_2021
+- conditions for the AI to sell back damaged structures was reworked
+- AI will sell some of the captured buildings
+- AI repairs structures if can make money and cash > 300
+
+19_01_2021
+- Oil derricks can be repaired
+- if helipad is busy, created heli units enter the map from the closest border to helipad (as requested by Mike)
+
+06_01_2021
+- player vehicles can use ally repair depots for repairs
+- AI sends engineers to capture oil derricks
+- Minigunner range slightly increased (from 0.0280 to 0.0300)
+- AI NOD airstrip limit reduce to three
+- Tweaks to infantry production priorities
+- Hospital strength increased from 200 to 300 points
+
+31_12_2020
+- player units can load on ally transports (e.g., when playing with friends with mods)
+- oil derricks cash value increased to 15
+- AI infantry building priorities slightly modified to avoid grenadier / flamethrower bias
+- AI commando sabotage enemy buildings
+- AI tiberium income advantage has been reduced
