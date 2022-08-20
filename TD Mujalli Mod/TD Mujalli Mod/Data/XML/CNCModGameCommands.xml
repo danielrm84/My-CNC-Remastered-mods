@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+
+<ModGameCommands>
+
+	<CNCModGameCommandManager>
+
+		<CNCModGameCommands>
+
+			<Command Name="NTNK">
+				<GameCommand>GAME_COMMAND_TD_MOD_CUSTOM_BUILD1</GameCommand>
+			</Command>
+			<Command Name="HOSP">
+				<GameCommand>GAME_COMMAND_TD_MOD_CUSTOM_BUILD2</GameCommand>
+			</Command>
+			<Command Name="BIO">
+				<GameCommand>GAME_COMMAND_TD_MOD_CUSTOM_BUILD3</GameCommand>
+			</Command>
+			<Command Name="MISS">
+				<GameCommand>GAME_COMMAND_TD_MOD_CUSTOM_BUILD4</GameCommand>
+			</Command>
+			
+			<Command Name="CHAN">
+				<GameCommand>GAME_COMMAND_TD_MOD_CUSTOM_BUILD5</GameCommand>
+			</Command>
+			<Command Name="DELPHI">
+				<GameCommand>GAME_COMMAND_TD_MOD_CUSTOM_BUILD6</GameCommand>
+			</Command>
+			<Command Name="MOEBIUS">
+				<GameCommand>GAME_COMMAND_TD_MOD_CUSTOM_BUILD7</GameCommand>
+			</Command>
+			<Command Name="C10">
+				<GameCommand>GAME_COMMAND_TD_MOD_CUSTOM_BUILD8</GameCommand>
+			</Command>
+			
+			<Command Name="C1">
+				<GameCommand>GAME_COMMAND_TD_MOD_CUSTOM_BUILD9</GameCommand>
+			</Command>
+			<Command Name="C2">
+				<GameCommand>GAME_COMMAND_TD_MOD_CUSTOM_BUILD11</GameCommand>
+			</Command>
+			<Command Name="C3">
+				<GameCommand>GAME_COMMAND_TD_MOD_CUSTOM_BUILD12</GameCommand>
+			</Command>
+			<Command Name="C4">
+				<GameCommand>GAME_COMMAND_TD_MOD_CUSTOM_BUILD13</GameCommand>
+			</Command>
+			<Command Name="C5">
+				<GameCommand>GAME_COMMAND_TD_MOD_CUSTOM_BUILD14</GameCommand>
+			</Command>
+			<Command Name="C6">
+				<GameCommand>GAME_COMMAND_TD_MOD_CUSTOM_BUILD15</GameCommand>
+			</Command>
+			<Command Name="C7">
+				<GameCommand>GAME_COMMAND_TD_MOD_CUSTOM_BUILD16</GameCommand>
+			</Command>
+			<Command Name="C8">
+				<GameCommand>GAME_COMMAND_TD_MOD_CUSTOM_BUILD17</GameCommand>
+			</Command>
+			<Command Name="C9">
+				<GameCommand>GAME_COMMAND_TD_MOD_CUSTOM_BUILD18</GameCommand>
+			</Command>
+			<Command Name="MHQ">
+				<GameCommand>GAME_COMMAND_TD_MOD_CUSTOM_BUILD19</GameCommand>
+			</Command>
+
+
+		</CNCModGameCommands>
+
+	</CNCModGameCommandManager>
+
+</ModGameCommands>

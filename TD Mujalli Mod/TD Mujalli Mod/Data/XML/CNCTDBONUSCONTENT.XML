@@ -1,0 +1,1292 @@
+<?xml version="1.0"?>
+
+<CNC_Tiberian_Dawn_Bonus_Content>
+
+   <BonusConentManager>
+
+      <BonusContentData>
+
+         <!-- TIBERIAN DAWN DATA GOES HERE WITH CONTENT UNLOCKS 001+ -->
+
+			<!-- Installer -->
+         <Unlock Name="000">
+            <ElementNumber> 0 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_0_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_0_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_0_TITLE </LockedTooltipTextID>
+            <VideoClipName> TD/INTRO1B.BK2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_000_Image.tga </ThumbnailName> 			
+            <VideoClipImageName> UI_Bonus_Content_000_Image_Large_Movie.tga </VideoClipImageName> <!-- Since paused video has a black frame, show an overlay placard/thumbnail -->			
+            <UnlockOnMissionCompletions> </UnlockOnMissionCompletions>
+            <AlwaysUnlocked> true </AlwaysUnlocked>
+         </Unlock>
+			<!-- GDI 1 -->
+         <Unlock Name="001">
+            <ElementNumber> 1 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_1_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_1_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_1_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP10-01 Shepperd GDI-1.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_001_Image.tga </ThumbnailName> 			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> MOBIUS_GDI_CAMPAIGN_1_MAP </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>
+         <Unlock Name="002">
+            <ElementNumber> 2 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_2_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_2_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_1_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP26-01 GDI 1 Briefing.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_002_Image.tga </ThumbnailName>						
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> MOBIUS_GDI_CAMPAIGN_1_MAP </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>
+         <Unlock Name="003">
+            <ElementNumber> 3 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_84_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_801_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_1_LOCK </LockedTooltipTextID>
+            <VideoClipName> TD\GDI1_comparison.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_003_Image.tga </ThumbnailName>					
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> MOBIUS_GDI_CAMPAIGN_1_MAP </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>			 
+			<!-- GDI 2 -->		 
+         <Unlock Name="004">
+            <ElementNumber> 4 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_3_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_3_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_3_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP10-02 Shepperd GDI-2.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_004_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> MOBIUS_GDI_CAMPAIGN_2_MAP </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>
+         <Unlock Name="005">
+            <ElementNumber> 5 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_4_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_4_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_3_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP10-06 Carter GDI-2.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_005_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> MOBIUS_GDI_CAMPAIGN_2_MAP </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>
+         <Unlock Name="006">
+            <ElementNumber> 6 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_5_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_5_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_3_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP26-02 GDI 2 Briefing.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_006_Image.tga </ThumbnailName>				
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> MOBIUS_GDI_CAMPAIGN_2_MAP </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>	
+			<!-- GDI 3 -->		 
+         <Unlock Name="007">
+            <ElementNumber> 7 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_6_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_6_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_6_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP10-03 Shepperd GDI-3.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_007_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> MOBIUS_GDI_CAMPAIGN_3_MAP </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>
+         <Unlock Name="008">
+            <ElementNumber> 8 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY__TITLE7 </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_7_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_6_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP26-03 GDI 3 Briefing.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_008_Image.tga </ThumbnailName>				
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> MOBIUS_GDI_CAMPAIGN_3_MAP </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>
+         <Unlock Name="009">
+            <ElementNumber> 9 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_8_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_8_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_6_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP26-04 GDI 3 Briefing.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_009_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> MOBIUS_GDI_CAMPAIGN_3_MAP </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>	
+			<!-- GDI 4 -->		 
+         <Unlock Name="010">
+            <ElementNumber> 10 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_9_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_9_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_9_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP10-04 Shepperd GDI-4.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_010_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Campaign_4_Rods_West_Map </mission>
+               <mission> Mobius_GDI_Campaign_4_Rods_East_Map </mission>
+               <mission> Mobius_GDI_Campaign_4_Bialystok_Map </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>
+         <Unlock Name="011">
+            <ElementNumber> 11 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_10_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_10_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_9_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP16-01 Morelli GDI-4a.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_011_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Campaign_4_Rods_West_Map </mission>
+               <mission> Mobius_GDI_Campaign_4_Rods_East_Map </mission>
+               <mission> Mobius_GDI_Campaign_4_Bialystok_Map </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>
+         <Unlock Name="012">
+            <ElementNumber> 12 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_85_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_11_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_9_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP16-02 Morelli GDI-4b.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_012_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Campaign_4_Rods_West_Map </mission>
+               <mission> Mobius_GDI_Campaign_4_Rods_East_Map </mission>
+               <mission> Mobius_GDI_Campaign_4_Bialystok_Map </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>
+         <Unlock Name="013">
+            <ElementNumber> 13 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_86_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_808_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_9_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP06-02 Burdet.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_013_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Campaign_4_Rods_West_Map </mission>
+               <mission> Mobius_GDI_Campaign_4_Rods_East_Map </mission>
+               <mission> Mobius_GDI_Campaign_4_Bialystok_Map </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>	
+         <Unlock Name="014">
+            <ElementNumber> 14 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_11_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_809_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_9_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP06-03 Burdet.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_014_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Campaign_4_Rods_West_Map </mission>
+               <mission> Mobius_GDI_Campaign_4_Rods_East_Map </mission>
+               <mission> Mobius_GDI_Campaign_4_Bialystok_Map </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>			 
+			<!-- GDI 5 -->
+		<Unlock Name="015">
+            <ElementNumber> 15 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_15_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_15_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_12_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP26-11 Podium.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_018_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Campaign_5_Germany_A </mission>
+               <mission> Mobius_GDI_Campaign_5_Germany_B </mission>
+               <mission> Mobius_GDI_Campaign_5_Ukraine_A </mission>
+               <mission> Mobius_GDI_Campaign_5_Ukraine_B </mission>			   
+            </UnlockOnMissionCompletions>
+         </Unlock>			
+			<!-- GDI 6 -->		 
+         <Unlock Name="016">
+            <ElementNumber> 16 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_13_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_13_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_14_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP10-07 Carter GDI-6.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_016_Image.tga </ThumbnailName>				
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Inflitrate_NOD_Base </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>
+			<!-- GDI 7 -->		 
+         <Unlock Name="017">
+            <ElementNumber> 17 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_14_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_14_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_15_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP10-08 Carter GDI-7.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_017_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Finish_NOD_Base </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>
+			<!-- GDI 8 -->		 
+         <Unlock Name="018">
+            <ElementNumber> 18 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_87_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_810_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_16_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP06-01 Burdet.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_019_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Protect_Bratislava </mission>
+               <mission> Mobius_GDI_Restore_GDI_Salzburg </mission>			   
+            </UnlockOnMissionCompletions>
+         </Unlock>	
+         <Unlock Name="019">
+            <ElementNumber> 19 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_88_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_811_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_16_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP15-10 Kane TBRINFO1.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_020_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Protect_Bratislava </mission>
+               <mission> Mobius_GDI_Restore_GDI_Salzburg </mission>	
+            </UnlockOnMissionCompletions>
+         </Unlock>		 
+			<!-- GDI 9 -->		 
+         <Unlock Name="020">
+            <ElementNumber> 20 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_16_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_16_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_17_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP16-04 Carter GDI-9.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_021_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Secure_Danube </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>	
+			<!-- GDI 10 -->		 
+         <Unlock Name="021">
+            <ElementNumber> 21 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_17_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_17_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_19_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP16-03 Morelli GDI-10.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_022_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Test_Orca_A </mission>
+               <mission> Mobius_GDI_Test_Orca_B </mission>			   
+            </UnlockOnMissionCompletions>
+         </Unlock>		 
+         <Unlock Name="022">
+            <ElementNumber> 22 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_89_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_18_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_19_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP26-05 GDI 10 Briefing.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_023_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Test_Orca_A </mission>
+               <mission> Mobius_GDI_Test_Orca_B </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>
+         <Unlock Name="023">
+            <ElementNumber> 23 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_18_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_813_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_19_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP13-02 Mobius Interview TBRINFO2.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_024_Image.tga </ThumbnailName>				
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Test_Orca_A </mission>
+               <mission> Mobius_GDI_Test_Orca_B </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>	
+		 
+         <Unlock Name="024">
+            <ElementNumber> 24 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_12_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_12_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_19_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP10-05 Shepperd GDI-5.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_015_Image.tga </ThumbnailName>				
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Test_Orca_A </mission>
+               <mission> Mobius_GDI_Test_Orca_B </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>		 
+			<!-- GDI 11 -->		 
+         <Unlock Name="025">
+            <ElementNumber> 25 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_19_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_19_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_20_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP26-06 GDI 11 Briefing.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_025_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+				<mission> Mobius_GDI_Evacuate_Delphi </mission>	   
+            </UnlockOnMissionCompletions>
+         </Unlock>	
+			<!-- GDI 12 -->		 
+         <Unlock Name="026">
+            <ElementNumber> 26 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_20_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_20_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_21_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP26-07 GDI 12 Briefing.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_026_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Evacuate_Mobius_A </mission>
+               <mission> Mobius_GDI_Evacuate_Mobius_B </mission>			   
+            </UnlockOnMissionCompletions>
+         </Unlock>	
+         <Unlock Name="027">
+            <ElementNumber> 27 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_90_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_814_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_21_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP13-03 Mobius TBRINFO3.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_027_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Evacuate_Mobius_A </mission>
+               <mission> Mobius_GDI_Evacuate_Mobius_B </mission>	
+            </UnlockOnMissionCompletions>
+         </Unlock>			 
+			<!-- GDI 13 -->		 
+         <Unlock Name="028">
+            <ElementNumber> 28 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_21_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_21_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_22_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP26-08 GDI 13 Briefing.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_028_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Level_Lab_A </mission>
+               <mission> Mobius_GDI_Level_Lab_B </mission>			   
+            </UnlockOnMissionCompletions>
+         </Unlock>	
+			<!-- GDI 14 -->		 
+         <Unlock Name="029">
+            <ElementNumber> 29 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_22_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_22_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_23_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP26-09 GDI 14 Briefing.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_029_Image.tga </ThumbnailName>				
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Fish_In_A_Barrel </mission>		   
+            </UnlockOnMissionCompletions>
+         </Unlock>	
+			<!-- GDI 15 -->		 
+         <Unlock Name="030">
+            <ElementNumber> 30 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_23_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_23_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_24_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP26-10 GDI 15 Briefing.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_030_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Destroy_Bastards_A </mission>
+               <mission> Mobius_GDI_Destroy_Bastards_B </mission>
+               <mission> Mobius_GDI_Destroy_Bastards_C </mission>			   
+            </UnlockOnMissionCompletions>
+         </Unlock>	
+			<!-- GDI Campaign Complete -->		 
+         <Unlock Name="031">
+            <ElementNumber> 31 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_24_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_24_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_24_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP Kane Finales.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_031_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Destroy_Bastards_A </mission>
+               <mission> Mobius_GDI_Destroy_Bastards_B </mission>
+               <mission> Mobius_GDI_Destroy_Bastards_C </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>	
+         <Unlock Name="032">
+            <ElementNumber> 32 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_32_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_26_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_24_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP Nod Soldiers.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_032_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Destroy_Bastards_A </mission>
+               <mission> Mobius_GDI_Destroy_Bastards_B </mission>
+               <mission> Mobius_GDI_Destroy_Bastards_C </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>	
+         <Unlock Name="033">
+            <ElementNumber> 33 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_33_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_29_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_24_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP17 News Anchor.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_033_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Destroy_Bastards_A </mission>
+               <mission> Mobius_GDI_Destroy_Bastards_B </mission>
+               <mission> Mobius_GDI_Destroy_Bastards_C </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>	
+	 
+			<!-- Nod 1 -->
+        <Unlock Name="034">
+            <ElementNumber> 34 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_34_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_34_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_34_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP25-01 Nod 1 Briefing.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_034_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Nod_Campaign_1_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>
+        <Unlock Name="035">
+            <ElementNumber> 35 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_91_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_803_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_34_LOCK </LockedTooltipTextID>
+            <VideoClipName> TD\Nod1_comparison.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_035_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Nod_Campaign_1_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>		
+			<!-- Nod 2 -->
+        <Unlock Name="036">
+            <ElementNumber> 36 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_35_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_35_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_35_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP25-02 Nod 2 Briefing.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_036_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Nod_Campaign_2A_Map </mission>
+			   <mission> Mobius_Nod_Campaign_2B_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>
+			<!-- Nod 3 -->
+        <Unlock Name="037">
+            <ElementNumber> 37 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_36_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_36_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_36_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP25-03 Nod 3 Briefing.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_037_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Nod_Campaign_3A_Map </mission>
+			   <mission> Mobius_Nod_Campaign_3B_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>
+			<!-- Nod 4 -->
+        <Unlock Name="038">
+            <ElementNumber> 38 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_37_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_37_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_37_LOCK </LockedTooltipTextID>
+            <ImageName> 097p-78.tga </ImageName>
+            <ThumbnailName> UI_Bonus_Content_038_Image.tga </ThumbnailName>				
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Nod_Campaign_4A_Map </mission>
+			   <mission> Mobius_Nod_Campaign_4B_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>		
+			<!-- Nod 5 -->
+        <Unlock Name="039">
+            <ElementNumber> 39 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_38_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_38_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_38_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP25-05 Nod 5 Briefing.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_039_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Nod_Campaign_5_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>	
+        <Unlock Name="040">
+            <ElementNumber> 040 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_92_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_812_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_38_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP25-04 Seth Pre.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_040_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Nod_Campaign_5_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>		
+			<!-- Nod 6 -->
+        <Unlock Name="041">
+            <ElementNumber> 41 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_39_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_39_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_39_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP25-06 Nod 6 Briefing.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_041_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Nod_Campaign_6A_Map </mission>
+			   <mission> Mobius_Nod_Campaign_6B_Map </mission>
+			   <mission> Mobius_Nod_Campaign_6C_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>		
+			<!-- Nod 7 -->
+        <Unlock Name="042">
+            <ElementNumber> 42 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_40_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_40_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_40_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP25-07 Nod 7a Briefing.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_042_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Nod_Campaign_7A_Map </mission>
+			   <mission> Mobius_Nod_Campaign_7B_Map </mission>
+			   <mission> Mobius_Nod_Campaign_7C_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>		
+        <Unlock Name="043">
+            <ElementNumber> 43 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_41_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_41_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_40_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP25-08 Nod 7b Briefing.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_043_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Nod_Campaign_7A_Map </mission>
+			   <mission> Mobius_Nod_Campaign_7B_Map </mission>
+			   <mission> Mobius_Nod_Campaign_7C_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>		
+			<!-- Nod 8 -->
+        <Unlock Name="044">
+            <ElementNumber> 44 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_42_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_42_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_42_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP25-09 Nod 8 Briefing.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_044_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Nod_Campaign_8A_Map </mission>
+			   <mission> Mobius_Nod_Campaign_8B_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>		
+			<!-- Nod 9 -->
+        <Unlock Name="045">
+            <ElementNumber> 45 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_43_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_43_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_43_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP15-01 Kane Nod-9.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_045_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Nod_Campaign_9_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>
+			<!-- Nod 10 -->
+        <Unlock Name="046">
+            <ElementNumber> 46 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_44_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_44_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_44_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP15-02 Kane TIBINFO2.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_046_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Nod_Campaign_10A_Map </mission>
+			   <mission> Mobius_Nod_Campaign_10B_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>
+        <Unlock Name="047">
+            <ElementNumber> 47 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_46_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_45_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_44_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP15-03 Kane Nod-10a.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_047_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Nod_Campaign_10A_Map </mission>
+			   <mission> Mobius_Nod_Campaign_10B_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>
+        <Unlock Name="048">
+            <ElementNumber> 48 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_47_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_46_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_44_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP15 Kane Nod-10.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_048_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Nod_Campaign_10A_Map </mission>
+			   <mission> Mobius_Nod_Campaign_10B_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>		
+			<!-- Nod 11 -->
+        <Unlock Name="049">
+            <ElementNumber> 49 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_48_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_48_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_48_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP15-07 Kane Nod-11.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_049_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Nod_Campaign_11A_Map </mission>
+			   <mission> Mobius_Nod_Campaign_11B_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>
+			<!-- Nod 12 -->
+        <Unlock Name="050">
+            <ElementNumber> 50 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_49_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_49_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_49_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP15-08 Kane Nod-12.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_050_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Nod_Campaign_12_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>		
+			<!-- Nod 13 -->
+        <Unlock Name="051">
+            <ElementNumber> 51 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_50_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_50_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_50_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP15-09 Kane Nod-13.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_051_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Nod_Campaign_13A_Map </mission>
+			   <mission> Mobius_Nod_Campaign_13B_Map </mission>
+			   <mission> Mobius_Nod_Campaign_13C_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>
+			<!-- Nod Campaign Complete -->		
+        <Unlock Name="052">
+            <ElementNumber> 52 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_51_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_51_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_50_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP06-04 Kane.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_052_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Nod_Campaign_13A_Map </mission>
+			   <mission> Mobius_Nod_Campaign_13B_Map </mission>
+			   <mission> Mobius_Nod_Campaign_13C_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>		
+        <Unlock Name="053">
+            <ElementNumber> 53 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_52_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_52_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_50_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP15-12 Kane NodFinal.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_053_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Nod_Campaign_13A_Map </mission>
+			   <mission> Mobius_Nod_Campaign_13B_Map </mission>
+			   <mission> Mobius_Nod_Campaign_13C_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>		
+        <Unlock Name="054">
+            <ElementNumber> 54 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_53_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_53_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_50_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP18 News Anchor NodEndings2a.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_054_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Nod_Campaign_13A_Map </mission>
+			   <mission> Mobius_Nod_Campaign_13B_Map </mission>
+			   <mission> Mobius_Nod_Campaign_13C_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>	
+        <Unlock Name="055">
+            <ElementNumber> 55 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_54_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_53_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_50_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP18 News Anchor NodEndings2b.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_055_Image.tga </ThumbnailName>				
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Nod_Campaign_13A_Map </mission>
+			   <mission> Mobius_Nod_Campaign_13B_Map </mission>
+			   <mission> Mobius_Nod_Campaign_13C_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>		
+        <Unlock Name="056">
+            <ElementNumber> 56 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_55_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_61_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_50_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP19-02 Nod Soldiers Nod Ending.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_056_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Nod_Campaign_13A_Map </mission>
+			   <mission> Mobius_Nod_Campaign_13B_Map </mission>
+			   <mission> Mobius_Nod_Campaign_13C_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>		
+		
+		
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- ***********  			COVERT OPS      							********* -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+
+			<!-- Covert Ops: Blackout (GDI) -->
+		<Unlock Name="057">
+			<ElementNumber> 57 </ElementNumber>
+			<TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_1002_TITLE </TitleTextID>
+			<InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_1002_INFO </InfoTextID>
+			<LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_1002_LOCK</LockedTooltipTextID>
+			<AudioClipWAVName> Music\TDB_MUS_CC_Credits_Outtakes.wav </AudioClipWAVName>
+			<AudioClipImageName> UI_Bonus_Content_MusicOnly_TD.tga </AudioClipImageName>
+			<AudioJukeboxUnlockName> CC_Credits_Outtakes </AudioJukeboxUnlockName>
+            <ThumbnailName> UI_Bonus_Content_057_Image.tga </ThumbnailName>			
+			<UnlockOnMissionCompletions>
+				<mission> Mobius_Covert_Ops_Campaign_22_Map </mission>
+			</UnlockOnMissionCompletions>
+		</Unlock>			
+			<!-- Hell's Fury (GDI) -->
+         <Unlock Name="058">
+            <ElementNumber> 58 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_63_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_63_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_63_LOCK </LockedTooltipTextID>
+            <ImageName> 082p-14.tga </ImageName>
+            <ThumbnailName> UI_Bonus_Content_058_Image.tga </ThumbnailName>				
+            <UnlockOnMissionCompletions>
+               <mission> Mobius_Covert_Ops_Campaign_23_Map </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>			
+			<!-- Infiltrated! (GDI) -->
+         <Unlock Name="059">
+            <ElementNumber> 59 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_64_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_64_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_64_LOCK </LockedTooltipTextID>
+            <ImageName> 048-17.tga </ImageName>
+            <ThumbnailName> UI_Bonus_Content_059_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <mission> Mobius_Covert_Ops_Campaign_36_Map </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>			
+			<!-- Elemental Imperative (GDI) -->
+         <Unlock Name="060">
+            <ElementNumber> 60 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_65_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_65_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_65_LOCK </LockedTooltipTextID>
+            <ImageName> 027-24.tga </ImageName>
+            <ThumbnailName> UI_Bonus_Content_060_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <mission> Mobius_Covert_Ops_Campaign_38_Map </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>			
+			<!-- Ground Zero (GDI) -->
+         <Unlock Name="061">
+            <ElementNumber> 61 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_66_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_66_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_66_LOCK </LockedTooltipTextID>
+            <ImageName> 034-1.tga </ImageName>
+            <ThumbnailName> UI_Bonus_Content_061_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <mission> Mobius_Covert_Ops_Campaign_40_Map </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>			
+			<!-- Twist of Fate (GDI) -->
+         <Unlock Name="062">
+            <ElementNumber> 62 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_67_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_67_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_67_LOCK </LockedTooltipTextID>
+            <ImageName> 034-11.tga </ImageName>
+            <ThumbnailName> UI_Bonus_Content_062_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <mission> Mobius_Covert_Ops_Campaign_41_Map </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>			
+			<!-- Blindsided (GDI) -->
+         <Unlock Name="063">
+            <ElementNumber> 63 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_62_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_62_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_62_LOCK </LockedTooltipTextID>
+            <ImageName> 082p-16.tga </ImageName>
+            <ThumbnailName> UI_Bonus_Content_063_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <mission> Mobius_Covert_Ops_Campaign_50_Map </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>	
+	 
+			<!-- Bad Neighborhood (Nod) -->
+		<Unlock Name="064">
+			<ElementNumber> 64 </ElementNumber>
+			<TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_1001_TITLE </TitleTextID>
+			<InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_1001_INFO</InfoTextID>
+			<LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_1001_LOCK </LockedTooltipTextID>
+			<AudioClipWAVName> Music\TDB_MUS_Tank_Battle_CO.wav </AudioClipWAVName>
+			<AudioClipImageName> UI_Bonus_Content_MusicOnly_TD.tga </AudioClipImageName>
+			<AudioJukeboxUnlockName> Tank_Battle </AudioJukeboxUnlockName>
+            <ThumbnailName> UI_Bonus_Content_064_Image.tga </ThumbnailName>			
+			<UnlockOnMissionCompletions>
+				<mission> Mobius_Covert_Ops_Campaign_Nod_20_Map </mission>
+			</UnlockOnMissionCompletions>
+		</Unlock>
+			<!-- Deceit (Nod) -->
+        <Unlock Name="065">
+            <ElementNumber> 65 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_70_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_70_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_70_LOCK </LockedTooltipTextID>
+            <ImageName> TD_VQs.tga </ImageName>
+            <ThumbnailName> UI_Bonus_Content_065_Image.tga </ThumbnailName>				
+            <UnlockOnMissionCompletions>
+               <mission> Mobius_Covert_Ops_Campaign_Nod_21_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>			
+			<!-- Eviction Notice (Nod) -->
+         <Unlock Name="066">
+            <ElementNumber> 66 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_71_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_71_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_71_LOCK </LockedTooltipTextID>
+            <ImageName> 066-2.tga </ImageName>
+            <ThumbnailName> UI_Bonus_Content_066_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <mission> Mobius_Covert_Ops_Campaign_Nod_30_Map </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>			
+			<!-- The Tiberium Strain (Nod) -->
+         <Unlock Name="067">
+            <ElementNumber> 67</ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_69_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_69_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_69_LOCK </LockedTooltipTextID>
+            <ImageName> 034-22.tga </ImageName>
+            <ThumbnailName> UI_Bonus_Content_067_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <mission> Mobius_Covert_Ops_Campaign_Nod_31_Map </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>		 
+			<!-- Cloak and Dagger (Nod) -->
+         <Unlock Name="068">
+            <ElementNumber> 68 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_73_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_73_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_73_LOCK </LockedTooltipTextID>
+            <ImageName> WW128p-28.tga </ImageName>
+            <ThumbnailName> UI_Bonus_Content_068_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <mission> Mobius_Covert_Ops_Campaign_Nod_32_Map </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>			
+			<!-- Hostile Takeover (Nod) -->
+         <Unlock Name="069">
+            <ElementNumber> 69 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_74_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_74_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_74_LOCK </LockedTooltipTextID>
+            <ImageName> 048-9.tga </ImageName>
+            <ThumbnailName> UI_Bonus_Content_069_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <mission> Mobius_Covert_Ops_Campaign_Nod_33_Map </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>			
+			<!-- Under Siege (Nod) -->
+        <Unlock Name="070">
+            <ElementNumber> 70 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_76_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_76_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_76_LOCK </LockedTooltipTextID>
+            <ImageName> FC_FPO_FIX.tga </ImageName>
+            <ThumbnailName> UI_Bonus_Content_070_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <mission> Mobius_Covert_Ops_Campaign_Nod_35_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>		 
+			<!-- Nod Death Squad (Nod) -->
+        <Unlock Name="071">
+            <ElementNumber> 71 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_815_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_815_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_815_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP13-04 Mobius Screengrab.bk2 </VideoClipName>
+            <VideoClipImageName> UI_Bonus_Content_071_Image_Large_Movie.tga </VideoClipImageName>			
+            <ThumbnailName> UI_Bonus_Content_071_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <mission> Mobius_Covert_Ops_Campaign_Nod_37_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>		
+				
+
+
+
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- ***********  			FUNPARK MISSIONS 							********* -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+
+
+			<!-- FUNPARK Mission 01 -->
+        <Unlock Name="072">
+            <ElementNumber> 72 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_77_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_77_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_77_LOCK </LockedTooltipTextID>
+            <VideoClipName> BSP15-11 Kane Fun Park.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_072_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Jurassic_Campaign_1_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>			
+			<!-- FUNPARK Mission 02 -->
+        <Unlock Name="073">
+            <ElementNumber> 73 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_78_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_78_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_78_LOCK </LockedTooltipTextID>
+            <ImageName> TD_Master1a.tga </ImageName>
+            <ThumbnailName> UI_Bonus_Content_073_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+                <mission> Mobius_Jurassic_Campaign_2_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>			
+			<!-- FUNPARK Mission 03 -->
+        <Unlock Name="074">
+            <ElementNumber> 74 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_79_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_79_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_79_LOCK </LockedTooltipTextID>
+            <ImageName> TD_Master1c.tga </ImageName>
+            <ThumbnailName> UI_Bonus_Content_074_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Jurassic_Campaign_3_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>			
+			<!-- FUNPARK Mission 04 -->
+        <Unlock Name="075">
+            <ElementNumber> 75 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_80_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_80_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_80_LOCK </LockedTooltipTextID>
+            <ImageName> TD_Master2.tga </ImageName>
+            <ThumbnailName> UI_Bonus_Content_075_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Jurassic_Campaign_4_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>			
+			<!-- FUNPARK Mission 05 -->
+        <Unlock Name="076">
+            <ElementNumber> 76 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_81_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_81_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_81_LOCK </LockedTooltipTextID>
+            <ImageName> TD_MasterBoth.tga </ImageName>
+            <ThumbnailName> UI_Bonus_Content_076_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_Jurassic_Campaign_5_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>		
+
+
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- ***********  			CONSOLE MISSIONS 							********* -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+			<!-- N64 GDI Spec Op 01-->
+
+        <Unlock Name="077">
+            <ElementNumber> 077 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_82_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_806_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_806_LOCK </LockedTooltipTextID>
+            <VideoClipName> BONUS\CONSOLE\99_Mission_Gameplay.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_077_Image.tga </ThumbnailName>				
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_N64_GDI_Campaign_30_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>
+         <Unlock Name="078">
+            <ElementNumber> 78 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_83_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_800_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_806_LOCK </LockedTooltipTextID>
+            <VideoClipName> BONUS\CONSOLE\SCG01EA_INTRO.bk2 </VideoClipName>
+            <VideoClipImageName> UI_Bonus_Content_078_Image_Large_Movie.tga </VideoClipImageName>
+            <ThumbnailName> UI_Bonus_Content_078_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_N64_GDI_Campaign_30_Map </mission>
+            </UnlockOnMissionCompletions>
+         </Unlock>		
+			<!-- N64 Nod Spec Op 01-->
+        <Unlock Name="079">
+            <ElementNumber> 79 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_802_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_802_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_802_LOCK </LockedTooltipTextID>
+            <VideoClipName> BONUS\CONSOLE\SCB01EA_INTRO.bk2 </VideoClipName>
+            <VideoClipImageName> UI_Bonus_Content_079_Image_Large_Movie.tga </VideoClipImageName>			
+            <ThumbnailName> UI_Bonus_Content_079_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_N64_NOD_Campaign_21_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>
+			<!-- N64 GDI Spec Op 02-->		
+        <Unlock Name="080">
+            <ElementNumber> 80 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_804_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_804_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_804_LOCK </LockedTooltipTextID>
+            <VideoClipName> BONUS\CONSOLE\GDIFIN.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_080_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_N64_GDI_Campaign_90_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>
+			<!-- N64 Nod Spec Op 02-->
+        <Unlock Name="081">
+            <ElementNumber> 81 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_805_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_805_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_805_LOCK </LockedTooltipTextID>
+            <VideoClipName> BONUS\CONSOLE\NODFIN.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_081_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_N64_NOD_Campaign_22_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>		
+			<!-- PSX GDI Spec Op 01-->		
+        <Unlock Name="082">
+            <ElementNumber> 82 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_807_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_807_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_807_LOCK </LockedTooltipTextID>
+            <VideoClipName> BONUS\CONSOLE\97_Mission_Gameplay.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_082_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_PSX_GDI_Campaign_60_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>
+			<!-- PSX GDI Spec Op 02-->	
+        <Unlock Name="083">
+            <ElementNumber> 83 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_816_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_816_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_816_LOCK </LockedTooltipTextID>
+            <ImageName> EVA_1.tga </ImageName>	
+            <ThumbnailName> UI_Bonus_Content_083_Image.tga </ThumbnailName>				
+            <UnlockOnMissionCompletions>
+               <mission> Mobius_PSX_GDI_Campaign_61_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>	
+			<!-- PSX GDI Spec Op 03-->	
+        <Unlock Name="084">
+            <ElementNumber> 84 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_817_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_817_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_817_LOCK </LockedTooltipTextID>
+            <ImageName> EVA_2.tga </ImageName>	
+            <ThumbnailName> UI_Bonus_Content_084_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <mission> Mobius_PSX_GDI_Campaign_62_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>
+			<!-- PSX GDI Spec Op 04-->	
+        <Unlock Name="085">
+            <ElementNumber> 085 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_818_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_818_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_818_LOCK </LockedTooltipTextID>
+            <ImageName> EVA_3.tga </ImageName>			
+            <ThumbnailName> UI_Bonus_Content_085_Image.tga </ThumbnailName>
+            <UnlockOnMissionCompletions>
+               <mission> Mobius_PSX_GDI_Campaign_72_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>	
+			<!-- PSX Nod Spec Op 01-->	
+        <Unlock Name="086">
+            <ElementNumber> 86 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_819_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_819_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_819_LOCK </LockedTooltipTextID>		
+            <VideoClipName> EVA_Recording_1.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_086_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <mission> Mobius_PSX_NOD_Campaign_60_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>	
+			<!-- PSX Nod Spec Op 02-->	
+        <Unlock Name="087">
+            <ElementNumber> 87 </ElementNumber>
+            <TitleTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_820_TITLE </TitleTextID>
+            <InfoTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_820_INFO </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_820_LOCK </LockedTooltipTextID>		
+            <VideoClipName> EVA_Recording_2.bk2 </VideoClipName>
+            <ThumbnailName> UI_Bonus_Content_087_Image.tga </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <mission> Mobius_PSX_NOD_Campaign_61_Map </mission>
+            </UnlockOnMissionCompletions>
+        </Unlock>		
+					<!-- GDI 15 ION CANNON-->	
+        <Unlock Name="088">
+            <ElementNumber> 88 </ElementNumber>
+            <TitleTextID> GDI_SECRET_ION_CANNON_ENDING_SCENE </TitleTextID>
+            <InfoTextID> GDI_SECRET_ION_CANNON_ENDING_SCENE </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_24_LOCK </LockedTooltipTextID>		
+            <VideoClipName> TD/gdifinb.bk2 </VideoClipName>
+            <ThumbnailName> ICON_IONCANNON_X2_15.DDS </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Destroy_Bastards_A </mission>
+               <mission> Mobius_GDI_Destroy_Bastards_B </mission>
+               <mission> Mobius_GDI_Destroy_Bastards_C </mission>	
+            </UnlockOnMissionCompletions>
+        </Unlock>	
+		<Unlock Name="089">
+            <ElementNumber> 89 </ElementNumber>
+            <TitleTextID> GDI_SECRET_ION_CANNON_ENDING_CREDITS </TitleTextID>
+            <InfoTextID> GDI_SECRET_ION_CANNON_ENDING_CREDITS </InfoTextID>
+            <LockedTooltipTextID> TEXT_BONUS_CONTENT_CNC_TD_ENTRY_24_LOCK </LockedTooltipTextID>		
+            <VideoClipName> TD/gdiend2.bk2 </VideoClipName>
+            <ThumbnailName> ICON_IONCANNON_X2_15.DDS </ThumbnailName>			
+            <UnlockOnMissionCompletions>
+               <!-- Instances.xml -->
+               <mission> Mobius_GDI_Destroy_Bastards_A </mission>
+               <mission> Mobius_GDI_Destroy_Bastards_B </mission>
+               <mission> Mobius_GDI_Destroy_Bastards_C </mission>	
+            </UnlockOnMissionCompletions>
+        </Unlock>	
+			
+		
+
+
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- ***********  			AUDIO  UNLOCKS				 				********* -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+	<!-- **************************************************************************** -->
+
+	<!-- ************AUDIO UNLOCKS MOVED TO THEIR RESPECTIVE MISSION ABOVE************ -->
+	<!-- ************AUDIO UNLOCKS MOVED TO THEIR RESPECTIVE MISSION ABOVE************ -->	
+
+      </BonusContentData>
+
+   </BonusConentManager>
+
+</CNC_Tiberian_Dawn_Bonus_Content>
+      
+
