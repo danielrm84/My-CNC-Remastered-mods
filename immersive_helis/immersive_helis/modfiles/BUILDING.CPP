@@ -2222,20 +2222,6 @@ int BuildingClass::Exit_Object(TechnoClass * base)
 				int enter_y = 0;
 				DirType dir;	 // desired facing
 
-				/*if (max_x < 0) {
-					CCDebugString("mapwidth is negative");
-				}
-				else { CCDebugString("mapwidth is positive"); }
-				if (max_y < 0) { CCDebugString("mapheight is negative"); }
-				else {CCDebugString("mapheight is positive");}
-
-				if (pad_x > x) {
-					CCDebugString("padx > mapx");
-				}
-				else {
-					CCDebugString("padx < mapx");
-				}*/
-
 				// check the quadrant and assign as entering coord the closest coord to pad
 				if (pad_x > (x + max_x) / 2) { // right (1st or 4th quadrant)
 
@@ -2294,6 +2280,7 @@ int BuildingClass::Exit_Object(TechnoClass * base)
 				cell = XY_Cell(enter_x, enter_y);
 
 				ScenarioInit++;
+				//if (air->Unlimbo(Cell_Coord(cell), DIR_N)) {
 				if (air->Unlimbo(Cell_Coord(cell), dir)) {
 					air->Assign_Destination(::As_Target(Nearby_Location(air)));
 					air->Assign_Mission(MISSION_MOVE);

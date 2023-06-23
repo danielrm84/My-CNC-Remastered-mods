@@ -770,7 +770,9 @@ void AircraftClass::AI(void)
 	** Kerekupai: Aircraft returns to their pad after repairs
 	*/
 	if (Altitude == 0 && In_Radio_Contact() && Contact_With_Whom()->What_Am_I() == RTTI_BUILDING &&
-		*((BuildingClass *)Contact_With_Whom()) == STRUCT_REPAIR && Strength == Class->MaxStrength)
+		*((BuildingClass *)Contact_With_Whom()) == STRUCT_REPAIR &&
+		(Strength == Class->MaxStrength || (!House->IsHuman && House->Available_Money() < 1))
+		)
 	{
 		Transmit_Message(RADIO_OVER_OUT);
 		Process_Take_Off();
@@ -779,6 +781,43 @@ void AircraftClass::AI(void)
 	}
 	/*
 	** Kerekupai: end of Aircraft returns to their pad after repairs
+	*/
+
+	/*
+	** Kerekupai: if not ammo, send innactive helis back to their helipad
+	**			  else, set them to guard area
+	*/
+	if (!Class->IsFixedWing && *this != AIRCRAFT_TRANSPORT && !IsALoaner &&/*!House->IsHuman &&*/ Frame % 325 == 0 &&
+		Altitude > 0 && Get_Speed() == MPH_IMMOBILE && Mission != MISSION_REPAIR/*&& !Ammo*/)
+	{
+		if (!Ammo) {
+			BuildingClass * building = Find_Docking_Bay(STRUCT_HELIPAD, false);
+			if (building && !building->In_Radio_Contact() && Transmit_Message(RADIO_HELLO, building) == RADIO_ROGER)
+			{
+				Assign_Destination(building->As_Target());
+				if (Target_Legal(NavCom) && !building->Is_Something_Attached())
+				{
+					Assign_Mission(MISSION_MOVE);
+					Assign_Mission(MISSION_ENTER);
+				}
+				else {
+					Enter_Idle_Mode();
+					/*if (!Is_LZ_Clear(NavCom))
+					{
+						Assign_Destination(Good_LZ());
+						Assign_Mission(MISSION_MOVE);
+					}*/
+				}
+			}
+		}
+		else if (!House->IsHuman && House->Which_Zone(this) != ZONE_NONE) {
+			//Assign_Mission(MISSION_GUARD_AREA);
+			Enter_Idle_Mode();
+		}
+
+	}
+	/*
+	** Kerekupai: send innactive helis back to their helipad
 	*/
 
 	/*
@@ -991,30 +1030,6 @@ void AircraftClass::AI(void)
 		}
 #endif
 	}
-
-	/*
-	** Kerekupai: send innactive helis back to their helipad
-	*/
-	if (!Class->IsFixedWing && *this != AIRCRAFT_TRANSPORT && !IsALoaner &&/*!House->IsHuman &&*/ Frame % 325 == 0 &&
-		Altitude > 0 && Get_Speed() == MPH_IMMOBILE && !Ammo)
-	{
-		BuildingClass * building = Find_Docking_Bay(STRUCT_HELIPAD, false);
-		if (building && !building->In_Radio_Contact() && Transmit_Message(RADIO_HELLO, building) == RADIO_ROGER)
-		{
-			Assign_Destination(building->As_Target());
-			if (Target_Legal(NavCom) && !building->Is_Something_Attached())
-			{
-				Assign_Mission(MISSION_MOVE);
-				Assign_Mission(MISSION_ENTER);
-			}
-			else {
-				Enter_Idle_Mode();
-			}
-		}
-	}
-	/*
-	** Kerekupai: send innactive helis back to their helipad
-	*/
 
 }
 
@@ -1452,10 +1467,12 @@ bool AircraftClass::Is_LZ_Clear(TARGET target) const
 TARGET AircraftClass::check_overlap(TARGET oldlz) const
 {
 
-	Validate();
+	//int rule_scan_radius = 10;
 
-	// get current facing, x, y coordinates to check potential overlap with other helis, and
-	// to make sure that the heli will not try to find cells away map borders
+	assert(Aircraft.ID(this) == ID);
+	assert(IsActive);
+
+	//DirType current_dir = SecondaryFacing.Current();
 	FacingType current_facing = Dir_Facing(SecondaryFacing);
 	COORDINATE coord = As_Coord(oldlz);
 	int max_x = Map.MapCellWidth;
@@ -1522,12 +1539,12 @@ TARGET AircraftClass::check_overlap(TARGET oldlz) const
 			// check that x,y are within map boundaries
 			if (x < min_x)
 				x = min_x;
-			if (x > x + max_x)
-				x = x + max_x;
+			if (x >= min_x + max_x)
+				x = (min_x + max_x) - 1;
 			if (y < min_y)
 				y = min_y;
-			if (y > y + max_y)
-				y = y + max_y;
+			if (y >= min_y + max_y)
+				y = (min_y + max_y) - 1;
 
 			newcell = XY_Cell(x, y);
 			oldlz = ::As_Target(newcell);
@@ -1993,7 +2010,7 @@ int AircraftClass::Mission_Move(void)
 			*/
 		case FLY_TO_LZ:
 
-			if (Is_Target_Cell(NavCom)) // fix bug where heli would fly away from the map
+			if (Map.In_Radar(As_Cell(NavCom)))//(Is_Target_Cell(NavCom)) // fix bug where heli would fly away from the map
 			{
 				int distance = Process_Fly_To(true);
 
@@ -2013,16 +2030,16 @@ int AircraftClass::Mission_Move(void)
 						if (*this == AIRCRAFT_TRANSPORT && Is_LZ_Clear(NavCom))
 						{
 							// Kerekupai: adjust facing for landing
-							SecondaryFacing.Set_Desired(Pose_Dir()); 
+							SecondaryFacing.Set_Desired(Pose_Dir());
 						}
 					}
 
 					// Kerekupai: aircraft land on target position (if valid for landing)
-					// using the key "Left Alt" for landing
+					// using the key "L" for landing
 					if (distance < 0x0010)
 					{
 						// kerekupai: check if deploy key is pressed
-						bool deploykeydown = false; 
+						bool deploykeydown = false;
 
 						// try to catch the fact that some helicopters will not deliver 
 						// their cargo in single player missions
@@ -2030,6 +2047,7 @@ int AircraftClass::Mission_Move(void)
 							Is_LZ_Clear(NavCom) == true) ||	// landing zone clear
 							// Kerekupai: AI always land transport helis
 							(*this == AIRCRAFT_TRANSPORT && !House->IsHuman) ||
+							//(GameToPlay == GAME_NORMAL && Scenario == 13 && Is_LZ_Clear(NavCom) == true) ||
 							(gaming_with_friends && Is_LZ_Clear(NavCom) == true && * this == AIRCRAFT_TRANSPORT)
 							)
 						{
@@ -2041,7 +2059,7 @@ int AircraftClass::Mission_Move(void)
 
 							if (this->Is_Selected_By_Player() == true && // if unit selected by player
 								House == PlayerPtr && // if belongs to the player
-								Class->IsFixedWing == false && // if is an helicopter (just to play safe)
+								Class->IsFixedWing == false && // if is an helicopter
 								Is_LZ_Clear(NavCom) == true && // is clear for landing
 								deploykeydown == true
 								)
@@ -2061,6 +2079,7 @@ int AircraftClass::Mission_Move(void)
 								Assign_Destination(New_LZ(NavCom));
 
 							}
+							//deploykeydown = false;
 						}
 
 					}
@@ -2722,18 +2741,19 @@ int AircraftClass::Mission_Attack(void)
 			/*
 			** Kerekupai: return to base if there are no more targets nearby
 			*/
-			
+
 			if (Is_Weapon_Equipped() && Ammo && !Target_Legal(TarCom)) {
-				
+
 				// limit the searching range of the heli for human players only
-				if(House->IsHuman)
+				if (House->IsHuman)
 				{
 					int maxrange = MAX(Weapon_Range(0), Weapon_Range(1)) + 0x0500;
 
+					//Assign_Target(Greatest_Threat(THREAT_AREA));
 					if (*this == AIRCRAFT_ORCA)
-						Assign_Target(Greatest_Threat(THREAT_RANGE & THREAT_VEHICLES));
+						Assign_Target(Greatest_Threat(THREAT_RANGE | THREAT_AIR | THREAT_VEHICLES));
 					if (*this == AIRCRAFT_HELICOPTER)
-						Assign_Target(Greatest_Threat(THREAT_INFANTRY));
+						Assign_Target(Greatest_Threat(THREAT_RANGE | THREAT_INFANTRY));
 					if (!Target_Legal(TarCom) || Distance(TarCom) > maxrange)
 						Target_Something_Nearby(THREAT_RANGE);
 
@@ -2745,8 +2765,8 @@ int AircraftClass::Mission_Attack(void)
 				else {
 					Target_Something_Nearby(THREAT_RANGE);
 				}
-				
-				
+
+
 				if (Target_Legal(TarCom))
 					Status = PICK_ATTACK_LOCATION;
 				else {
@@ -2762,7 +2782,7 @@ int AircraftClass::Mission_Attack(void)
 				Assign_Destination(TARGET_NONE);
 				Enter_Idle_Mode();
 			}
-			
+
 			/*
 			** Kerekupai: end of return to base if there are no more targets nearby
 			*/
@@ -3814,9 +3834,14 @@ int AircraftClass::Mission_Guard_Area(void)
 		}
 		if (House->IsHuman) return(TICKS_PER_SECOND);
 
+		/*
+		** Kerekupai: the transport aircraft should stay on ground level to receive
+		**			  passengers when calling the foot guard area method
+		*/
 		if (Altitude == 0 && !In_Radio_Contact()) {
-			Scatter(0, true);
-			return(TICKS_PER_SECOND * 3);
+			//Scatter(0, true);
+			//return(TICKS_PER_SECOND * 3);
+			return(FootClass::Mission_Guard_Area());
 		}
 
 		if (Target_Legal(TarCom)) {
@@ -3852,25 +3877,25 @@ int AircraftClass::Mission_Guard_Area(void)
 		if (Is_Weapon_Equipped())
 		{
 			if (*this == AIRCRAFT_ORCA)
-				Assign_Target(Greatest_Threat(THREAT_RANGE & THREAT_VEHICLES));
+				Assign_Target(Greatest_Threat(THREAT_RANGE | THREAT_AIR | THREAT_VEHICLES));
 			if (*this == AIRCRAFT_HELICOPTER)
-				Assign_Target(Greatest_Threat(THREAT_INFANTRY));
+				Assign_Target(Greatest_Threat(THREAT_RANGE | THREAT_INFANTRY));
 			if (!Target_Legal(TarCom) || Distance(TarCom) > maxrange)
 				Target_Something_Nearby(THREAT_RANGE);
 		}
-			//Target_Something_Nearby(THREAT_RANGE);
-			//Assign_Target(Greatest_Threat(THREAT_RANGE & THREAT_VEHICLES));
+		//Target_Something_Nearby(THREAT_RANGE);
+		//Assign_Target(Greatest_Threat(THREAT_RANGE & THREAT_VEHICLES));
 
-		
+
 		if (Target_Legal(TarCom) && Distance(TarCom) <= maxrange && Ammo > 0) {
 			Assign_Mission(MISSION_ATTACK);
 			return(1);
 		}
 
 		return(FootClass::Mission_Guard_Area());
-	
+
 	}
-	
+
 	/*
 	** Kerekupai: end of Helis perform guard mode
 	*/
