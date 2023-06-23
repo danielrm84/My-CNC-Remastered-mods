@@ -1971,7 +1971,7 @@ int BuildingClass::Exit_Object(TechnoClass * base)
 			AircraftClass * air = (AircraftClass *)base;
 			/*
 			** Kerekupai: helis enter scenario from closest map border to active helipad
-			*/ 
+			*/
 			/*if (Cell_X(Coord_Cell(Center_Coord())) - Map.MapCellX < Map.MapCellWidth/2) {
 				cell = XY_Cell(Map.MapCellX-1, Random_Pick(0, Map.MapCellHeight-1)+Map.MapCellY);
 			} else {
@@ -2023,7 +2023,7 @@ int BuildingClass::Exit_Object(TechnoClass * base)
 				}
 			}
 			else {
-				if (pad_y < (y + max_y)/ 2) { // if Quadrant 2
+				if (pad_y < (y + max_y) / 2) { // if Quadrant 2
 					if (pad_x < pad_y) {
 						enter_x = x;
 						enter_y = pad_y;
@@ -2061,11 +2061,12 @@ int BuildingClass::Exit_Object(TechnoClass * base)
 				return(2);
 			}
 			ScenarioInit--;
-		
-	}
-	/*
-	** Kerekupai: end of helis enter scenario from closest map border to active helipad
-	*/
+
+
+		}
+		/*
+		** Kerekupai: end of helis enter scenario from closest map border to active helipad
+		*/
 			break;
 
 		case RTTI_VESSEL:
