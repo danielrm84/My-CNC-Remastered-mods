@@ -920,7 +920,7 @@ void GlyphX_Assign_Houses(void)
 		color = MPlayerID_To_ColorIndex(MPlayerID[i]);
 		housep = HouseClass::As_Pointer(house);
 		MPlayerHouses[i] = house;
-
+		
 		/*
 		**	Mark this house & color as used
 		*/
@@ -5910,10 +5910,10 @@ bool DLLExportClass::Get_Dynamic_Map_State(uint64 player_id, unsigned char *buff
 void DLLExportClass::Cell_Class_Draw_It(CNCDynamicMapStruct *dynamic_map, int &entry_index, CellClass *cell_ptr, int xpixel, int ypixel, bool debug_output)
 {
 	/*
-	** 
+	**
 	**  Based on CellClass::Draw_It and SmudgeTypeClass::Draw_It
-	** 
-	** 
+	**
+	**
 	*/
 
 	CELL	cell = cell_ptr->Cell_Number();
@@ -5923,7 +5923,7 @@ void DLLExportClass::Cell_Class_Draw_It(CNCDynamicMapStruct *dynamic_map, int &e
 	*/
 	if (cell_ptr->Smudge != SMUDGE_NONE) {
 		//SmudgeTypeClass::As_Reference(Smudge).Draw_It(x, y, SmudgeData);
-		
+
 		const SmudgeTypeClass &smudge_type = SmudgeTypeClass::As_Reference(cell_ptr->Smudge);
 
 		if (smudge_type.Get_Image_Data() != NULL) {
@@ -5933,12 +5933,12 @@ void DLLExportClass::Cell_Class_Draw_It(CNCDynamicMapStruct *dynamic_map, int &e
 				Debug_Write_Shape_Type(&smudge_type, 0);
 				IsTheaterShape = false;
 			}
-			
+
 			CNCDynamicMapEntryStruct &smudge_entry = dynamic_map->Entries[entry_index++];
 
 			strncpy(smudge_entry.AssetName, smudge_type.IniName, CNC_OBJECT_ASSET_NAME_LENGTH);
 			smudge_entry.AssetName[CNC_OBJECT_ASSET_NAME_LENGTH - 1] = 0;
-			smudge_entry.Type = (short) cell_ptr->Smudge;
+			smudge_entry.Type = (short)cell_ptr->Smudge;
 			smudge_entry.Owner = (char)cell_ptr->Owner;
 			smudge_entry.DrawFlags = SHAPE_WIN_REL;			// Looks like smudges are drawn top left
 			smudge_entry.PositionX = xpixel;
@@ -5965,11 +5965,11 @@ void DLLExportClass::Cell_Class_Draw_It(CNCDynamicMapStruct *dynamic_map, int &e
 		//IsTheaterShape = (bool)otype.IsTheater;
 		//CC_Draw_Shape(otype.Get_Image_Data(), OverlayData, (x+(CELL_PIXEL_W>>1)), (y+(CELL_PIXEL_H>>1)), WINDOW_TACTICAL, SHAPE_CENTER|SHAPE_WIN_REL|SHAPE_GHOST, NULL, Map.UnitShadow);
 		//IsTheaterShape = false;
-		
+
 		const OverlayTypeClass &overlay_type = OverlayTypeClass::As_Reference(cell_ptr->Overlay);
 
 		if (overlay_type.Get_Image_Data() != NULL) {
-			
+
 			CNCDynamicMapEntryStruct &overlay_entry = dynamic_map->Entries[entry_index++];
 
 
@@ -5982,10 +5982,10 @@ void DLLExportClass::Cell_Class_Draw_It(CNCDynamicMapStruct *dynamic_map, int &e
 			strncpy(overlay_entry.AssetName, overlay_type.IniName, CNC_OBJECT_ASSET_NAME_LENGTH);
 			overlay_entry.AssetName[CNC_OBJECT_ASSET_NAME_LENGTH - 1] = 0;
 			overlay_entry.Type = (short)cell_ptr->Overlay;
-			overlay_entry.Owner = (char) cell_ptr->Owner;
-			overlay_entry.DrawFlags = SHAPE_CENTER|SHAPE_WIN_REL|SHAPE_GHOST;		// Looks like overlays are drawn centered and translucent
-			overlay_entry.PositionX = xpixel + (CELL_PIXEL_W>>1);
-			overlay_entry.PositionY = ypixel + (CELL_PIXEL_H>>1);
+			overlay_entry.Owner = (char)cell_ptr->Owner;
+			overlay_entry.DrawFlags = SHAPE_CENTER | SHAPE_WIN_REL | SHAPE_GHOST;		// Looks like overlays are drawn centered and translucent
+			overlay_entry.PositionX = xpixel + (CELL_PIXEL_W >> 1);
+			overlay_entry.PositionY = ypixel + (CELL_PIXEL_H >> 1);
 			overlay_entry.Width = Get_Build_Frame_Width(overlay_type.Get_Image_Data());
 			overlay_entry.Height = Get_Build_Frame_Height(overlay_type.Get_Image_Data());
 			overlay_entry.CellX = Cell_X(cell);
@@ -6000,6 +6000,35 @@ void DLLExportClass::Cell_Class_Draw_It(CNCDynamicMapStruct *dynamic_map, int &e
 		}
 	}
 
+	/*
+	** Kerekupai: modern wall building mod
+	** Render wall placement cursor as temporary smudges.
+	** This reduces the visual glitches associated with the asynchronous build preview updates.
+	** pchote - "Modern Wall Building" mod.
+	*/
+	if (cell_ptr->IsCursorHere && ((BuildingTypeClass*)Map.PendingObject)->IsWall && cell != Map.ZoneCell) {
+
+		CNCDynamicMapEntryStruct& flag_entry = dynamic_map->Entries[entry_index++];
+
+		strncpy(flag_entry.AssetName, cell_ptr->Is_Generally_Clear() ? "PLACEMENT_GOOD" : "PLACEMENT_BAD", CNC_OBJECT_ASSET_NAME_LENGTH);
+		flag_entry.AssetName[CNC_OBJECT_ASSET_NAME_LENGTH - 1] = 0;
+		flag_entry.Type = -1;
+		flag_entry.Owner = cell_ptr->Owner;
+		flag_entry.DrawFlags = SHAPE_CENTER | SHAPE_GHOST | SHAPE_FADING;
+		flag_entry.PositionX = xpixel + (ICON_PIXEL_W / 2);
+		flag_entry.PositionY = ypixel + (ICON_PIXEL_H / 2);
+		flag_entry.Width = 24;
+		flag_entry.Height = 24;
+		flag_entry.CellX = Cell_X(cell);
+		flag_entry.CellY = Cell_Y(cell);
+		flag_entry.ShapeIndex = 0;
+		flag_entry.IsSmudge = true;
+		flag_entry.IsOverlay = false;
+		flag_entry.IsResource = false;
+		flag_entry.IsSellable = false;
+		flag_entry.IsTheaterShape = false;
+		flag_entry.IsFlag = false;
+	}
 
 	if (cell_ptr->IsFlagged) {
 
@@ -6012,7 +6041,7 @@ void DLLExportClass::Cell_Class_Draw_It(CNCDynamicMapStruct *dynamic_map, int &e
 			flag_entry.AssetName[CNC_OBJECT_ASSET_NAME_LENGTH - 1] = 0;
 			flag_entry.Type = -1;
 			flag_entry.Owner = cell_ptr->Owner;
-			flag_entry.DrawFlags = SHAPE_CENTER|SHAPE_GHOST|SHAPE_FADING;
+			flag_entry.DrawFlags = SHAPE_CENTER | SHAPE_GHOST | SHAPE_FADING;
 			flag_entry.PositionX = xpixel + (ICON_PIXEL_W / 2);
 			flag_entry.PositionY = ypixel + (ICON_PIXEL_H / 2);
 			flag_entry.Width = Get_Build_Frame_Width(image_data);
@@ -6029,8 +6058,8 @@ void DLLExportClass::Cell_Class_Draw_It(CNCDynamicMapStruct *dynamic_map, int &e
 		}
 
 	}
-		  
-}			  
+
+}
 
 
 

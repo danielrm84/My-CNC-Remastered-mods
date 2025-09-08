@@ -1166,6 +1166,23 @@ ResultType UnitClass::Take_Damage(int & damage, int distance, WarheadType warhea
 		if (*this == UNIT_HARVESTER && !House->IsHuman && source) {
 			Base_Is_Attacked(source);
 		}
+
+		/*
+		** Kerekupai: AI units fireback the source
+		**			  light vehicles prefer infantry, heavy, tanks
+		*/
+		if (!House->IsHuman && source != NULL && Target_Legal(source->As_Target()) && !House->Is_Ally(source->House) && *this != UNIT_GUNBOAT && Is_Weapon_Equipped() &&
+			Target_Legal(TarCom) && As_Object(TarCom)->Is_Techno() && 
+			(!((TechnoClass *)As_Object(TarCom))->Is_Weapon_Equipped() || 
+				(As_Object(TarCom)->What_Am_I() == RTTI_UNIT && (*this == UNIT_BUGGY || *this == UNIT_JEEP || *this == UNIT_APC) && source->What_Am_I() == RTTI_INFANTRY) ||
+				(As_Object(TarCom)->What_Am_I() == RTTI_INFANTRY && *this != UNIT_BUGGY && *this != UNIT_JEEP && *this != UNIT_APC && source->What_Am_I() != RTTI_INFANTRY && source->Is_Weapon_Equipped())) && 
+			(source->What_Am_I() != RTTI_AIRCRAFT || *this == UNIT_HTANK) && In_Range(source->As_Target())
+			)
+			Assign_Target(source->As_Target());
+
+		/*
+		** Kerekupai: end of AI units fireback the source
+		*/
 	}
 	return(res);
 }
@@ -2689,8 +2706,11 @@ int UnitClass::Mission_Unload(void)
 									/*
 									** Kerekupai: AI APC passengers unload and start mission hunt
 									*/
-									if (!House->IsHuman && (passenger->Is_Weapon_Equipped() || ((InfantryTypeClass *)passenger)->IsCapture))
+									if (!House->IsHuman && (passenger->Is_Weapon_Equipped() || *(InfantryClass *)passenger == INFANTRY_E7)) {
+										passenger->ArchiveTarget = TARGET_NONE;
+										passenger->Assign_Target(TARGET_NONE);
 										passenger->Assign_Mission(MISSION_HUNT);
+									}
 									/*
 									** Kerekupai: end of AI APC passengers unload and start mission hunt
 									*/
@@ -3409,6 +3429,13 @@ MoveType UnitClass::Can_Enter_Cell(CELL cell, FacingType ) const
 	if (*this == UNIT_GUNBOAT) return(MOVE_OK);
 
 	/*
+	** Kerekupai: AI has ghost harversters
+	*/
+	bool ghost_harvester = false;
+	if (*this == UNIT_HARVESTER && !House->IsHuman && GameToPlay != GAME_NORMAL)
+		ghost_harvester = true;
+
+	/*
 	**	Moving off the edge of the map is not allowed unless
 	**	this is a loaner vehicle.
 	*/
@@ -3482,7 +3509,10 @@ MoveType UnitClass::Can_Enter_Cell(CELL cell, FacingType ) const
 
 			bool is_moving = (obj->What_Am_I() == RTTI_INFANTRY || obj->What_Am_I() == RTTI_UNIT) && Target_Legal(((FootClass *)obj)->NavCom);
 
-			if (House->Is_Ally(obj)) {
+			/*
+			** Kerekupai: AI has ghost harversters
+			*/
+			if (House->Is_Ally(obj) && !ghost_harvester) {
 				if (is_moving) {
 					int face 		= Dir_Facing(PrimaryFacing);
 					int techface	= Dir_Facing(((FootClass const *)obj)->PrimaryFacing) ^4;
@@ -3554,7 +3584,11 @@ MoveType UnitClass::Can_Enter_Cell(CELL cell, FacingType ) const
 	**	If some allied object has reserved the cell, then consider the cell
 	**	as blocked by a moving object.
 	*/
+	/*
+	** Kerekupai: AI has ghost harversters
+	*/
 	if (retval == MOVE_OK && !crushable && cellptr->Flag.Composite) {
+	//if (retval == MOVE_OK && !crushable && cellptr->Flag.Composite && !ghost_harvester) {
 
 		/*
 		**	If reserved by a vehicle, then consider this blocked terrain.
@@ -3562,7 +3596,11 @@ MoveType UnitClass::Can_Enter_Cell(CELL cell, FacingType ) const
 		if (cellptr->Flag.Occupy.Vehicle) {
 			retval = MOVE_MOVING_BLOCK;
 		} else {
-			if (cellptr->InfType != HOUSE_NONE && House->Is_Ally(cellptr->InfType)) {
+			/*
+			** Kerekupai: AI has ghost harversters
+			*/
+			//if (cellptr->InfType != HOUSE_NONE && House->Is_Ally(cellptr->InfType)) {
+			if (cellptr->InfType != HOUSE_NONE && House->Is_Ally(cellptr->InfType) && !ghost_harvester) {
 				retval = MOVE_MOVING_BLOCK;
 			} else {
 
@@ -3587,7 +3625,15 @@ MoveType UnitClass::Can_Enter_Cell(CELL cell, FacingType ) const
 	** If its ok to move into the cell because we can crush whats in the cell, then
 	** make sure no one else is already moving into the cell to crush something.
 	*/
-	if (retval == MOVE_OK && crushable && cellptr->Flag.Occupy.Vehicle) {
+	/*
+	** Kerekupai: AI has ghost harversters
+	*/
+	if (retval == MOVE_MOVING_BLOCK && ghost_harvester && House->Is_Ally(cellptr->Cell_Unit()))
+	{
+		retval = MOVE_OK;
+	}
+	//if (retval == MOVE_OK && crushable && cellptr->Flag.Occupy.Vehicle) {
+	if (retval == MOVE_OK && crushable && cellptr->Flag.Occupy.Vehicle && !ghost_harvester) {
 
 #ifdef ADVANCED
 		/*
@@ -3603,6 +3649,12 @@ MoveType UnitClass::Can_Enter_Cell(CELL cell, FacingType ) const
 		return(MOVE_MOVING_BLOCK);
 #endif
 	}
+
+	/*
+	** Kerekupai: AI has ghost harversters
+	*/
+	if (cellptr->Cell_Unit() && House->Is_Ally(cellptr->Cell_Unit()) && ghost_harvester)
+		retval = MOVE_OK;
 
 	/*
 	**	Return with the most severe reason why this cell would be impassable.

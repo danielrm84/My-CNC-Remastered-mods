@@ -381,6 +381,7 @@
     <ClCompile Include="CDATA.CPP" />
     <ClCompile Include="CDFILE.CPP" />
     <ClCompile Include="CELL.CPP" />
+    <ClCompile Include="CFEPATCHQUERY.cpp" />
     <ClCompile Include="CHECKBOX.CPP" />
     <ClCompile Include="CHEKLIST.CPP" />
     <ClCompile Include="COLRLIST.CPP" />

@@ -2081,6 +2081,15 @@ bool CellClass::Goodie_Check(FootClass * object, bool check_steel)
 			}
 
 			/*
+			** Kerekupai: if AI and what == CLOAK and unit is Haverster, change what
+			*/
+			if (what == CLOAK && *((UnitClass *)object) == UNIT_HARVESTER && !object->House->IsHuman)
+				what = Random_Pick(0, 7);
+			/*
+			** Kerekupai: end of if AI and what == CLOAK and unit is Haverster, change what
+			*/
+
+			/*
 			**	Create the effect requested.
 			*/
 			switch (what) {
@@ -2344,7 +2353,24 @@ bool CellClass::Goodie_Check(FootClass * object, bool check_steel)
 						ObjectClass * obj = Map.Layer[LAYER_GROUND][index];
 
 						if (obj && obj->Is_Techno() && Distance(Cell_Coord(), obj->Center_Coord()) < 0x0300) {
-							((TechnoClass *)obj)->IsCloakable = true;
+							
+							/*
+							** Kerekupai: AI harvesters / buildings cannot get cloaked
+							*/
+							bool can_do_cloak = true;
+							if (!((TechnoClass *)obj)->House->IsHuman &&
+								((obj->What_Am_I() == RTTI_UNIT && *((UnitClass *)obj) == UNIT_HARVESTER) || obj->What_Am_I() == RTTI_BUILDING)
+								)
+							{
+								can_do_cloak = false;
+							}
+							if(can_do_cloak)
+								((TechnoClass *)obj)->IsCloakable = true;
+							/*
+							** Kerekupai: end of AI harvesters / buildings cannot get cloaked
+							*/
+			
+							//((TechnoClass *)obj)->IsCloakable = true;
 						}
 					}
 					break;

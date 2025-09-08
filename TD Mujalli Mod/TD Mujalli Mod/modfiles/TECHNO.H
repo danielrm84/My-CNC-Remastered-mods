@@ -201,6 +201,15 @@ class TechnoClass :	public RadioClass,
 		*/
 
 		/*
+		** Kerekupai: playing with friends?
+		*/
+		bool gaming_with_friends;
+		short n_human_players;
+		/*
+		** Kerekupai: end of playing with friends?
+		*/
+
+		/*
 		**	Used by the Obelisk laser to cache its laser weapon rendering data.
 		**  Line data is cleared after the specified delay.
 		**  Each line consists of: x, y, x1, y1, color, frame (max frame used to determine duration)

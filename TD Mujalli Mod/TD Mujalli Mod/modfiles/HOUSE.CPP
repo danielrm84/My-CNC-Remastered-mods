@@ -105,6 +105,11 @@
 #include "SidebarGlyphx.h"
 #include "defines.h"
 
+/*
+** Kerekupai: modern wall building
+** pchote - "Modern Wall Building" mod.
+*/
+extern bool DLL_Export_Get_Input_Key_State(KeyNumType key);
 
 /***********************************************************************************************
  * HouseClass::Validate -- validates house pointer															  *
@@ -1633,10 +1638,10 @@ void HouseClass::AI(void)
 		**			  AI uncloaks everything
 		**			  AI units can get invisible through crates
 		*/
-		if (GameToPlay != GAME_NORMAL && State == STATE_ENDGAME && !IsHuman  && Buildings.Count() < 1)
+		/*if (GameToPlay != GAME_NORMAL && State == STATE_ENDGAME && !IsHuman  && Buildings.Count() < 3)
 		{
 			Do_Uncloak_All();
-		}
+		}*/
 		/*
 		** Kerekupai: end of AI uncloaks everything
 		*/
@@ -1799,7 +1804,7 @@ void HouseClass::Harvested(unsigned tiberium)
 	int f = 1;
 	if (GameToPlay != GAME_NORMAL && !IsHuman)
 	{
-		f = 2;
+		f = 2; // previous 2;
 	}
 
 	//Tiberium += tiberium; // original code
@@ -2312,6 +2317,21 @@ unsigned char const * HouseClass::Remap_Table(bool blushing, bool unit) const
 	} else {
 
 		/*
+		** Kerekupai: modify just the multi6 of my TD color mod to set building color red
+		*/
+		/*
+		if (!unit && Class->House == HOUSE_MULTI6)
+		{
+			return(RemapRed);
+		}
+		else {
+			return(RemapTable);
+		}
+		*/
+		/*
+		** Kerekupai: modify just the multi6 of my TD color mod to set building color red
+		*/
+		/*
 		** For multiplayer games, return the remap table for this exact house instance.
 		*/
 		return(RemapTable);
@@ -2727,6 +2747,39 @@ void HouseClass::Special_Weapon_AI(SpecialWeaponType id)
 			}
 		}
 	}
+	/*
+	** Kerekupai: if gametoplay != game_normal -> AI selects a random enemy building with
+	**			  value >= that of the power plant (300)
+	*/
+	int const N = 100;
+	int list[N];
+	int n = 0;
+	
+	if (GameToPlay != GAME_NORMAL && Random_Pick(0, 99) < 50) {
+		n = 0;
+		best = 299; //  power plant cost 300
+
+		for (int index = 0; index < Buildings.Count(); index++) {
+			BuildingClass * b = Buildings.Ptr(index);
+
+			if (b != NULL && !b->IsInLimbo && b->Strength && !Is_Ally(b)) {
+				if (b->Class->Cost_Of() > best && n < N) {
+					list[n] = index; // store the index value of the building
+					n++;			 // update counter
+				}
+			}
+		}
+		// Randomly select a potential target
+		if (n > 0 && n <= N)
+		{
+			bestptr = Buildings.Ptr(list[(rand() % n)]);
+		}
+	}
+	/*
+	** Kerekupai: end of if gametoplay != game_normal -> AI selects a random enemy building with
+	**			  value >= that of the power plant (300)
+	*/
+	
 
 	if (bestptr) {
 		CELL cell = Coord_Cell(bestptr->Center_Coord());
@@ -3006,6 +3059,16 @@ bool HouseClass::Place_Object(RTTIType type, CELL cell)
 			if (tech) {
 				TechnoClass * builder = tech->Who_Can_Build_Me(false, false);
 				if (builder) {
+					/*
+					** Kerekupai: modern wall building
+					** If tech is a wall it will be replaced with an overlay and freed by Unlimbo.
+					** We must fetch the overlay type now, while we still can.
+					** pchote - "Modern Wall Building" mod.
+					*/
+					OverlayType otype = OVERLAY_NONE;
+					HousesType house = tech->House->Class->House;
+					if (tech->What_Am_I() == RTTI_BUILDING)
+						otype = ((BuildingClass*)tech)->Class->Overlay_Type();
 
 					/*
 					**	Ensures that the proximity check is performed even when the building is
@@ -3017,6 +3080,19 @@ bool HouseClass::Place_Object(RTTIType type, CELL cell)
 							factory->Completed();
 							Abandon_Production(type);
 
+							/*
+							** Add the line-built wall segments to the map.
+							** pchote - "Modern Wall Building" mod.
+							*/
+							bool ctrldown = DLL_Export_Get_Input_Key_State(KN_LCTRL);
+							if (otype != OVERLAY_NONE && !ctrldown)
+							{
+								OverlayTypeClass const& wall = OverlayTypeClass::As_Reference(otype);
+								DirType cardinal[4] = { DIR_N, DIR_E, DIR_S, DIR_W };
+								for (int i = 0; i < 4; i++)
+									Extend_Wall(wall, house, cell, cardinal[i], 5);
+							}
+
 							if (PlayerPtr == this) {
 								Sound_Effect(VOC_SLAM);
 								Map.Set_Cursor_Shape(0);
@@ -3025,7 +3101,8 @@ bool HouseClass::Place_Object(RTTIType type, CELL cell)
 								Map.PendingHouse = HOUSE_NONE;
 							}
 							return(true);
-						} else {
+						}
+						else {
 							if (this == PlayerPtr) {
 								Speak(VOX_DEPLOY);
 							}
@@ -3035,7 +3112,8 @@ bool HouseClass::Place_Object(RTTIType type, CELL cell)
 				}
 				return(false);
 
-			} else {
+			}
+			else {
 
 				// Play a bad sound here?
 				return(false);
@@ -3044,6 +3122,69 @@ bool HouseClass::Place_Object(RTTIType type, CELL cell)
 	}
 
 	return(true);
+	/*
+	** Kerekupai: end of modern wall bulding
+	*/
+}
+
+/***********************************************************************************************
+ * HouseClass::Extend_Wall -- Attempt to extend a line-built wall                              *
+ *                                                                                             *
+ *    This routine implements the wall placement behaviour from OpenRA.                        *
+ *    Step outwards in a specified direction up to a specified number of cells.                *
+ *    If we encounter an overlay of the specified wall type, break and create wall overlay     *
+ *    in the intermediate cells. If a matching wall is not found, or we encounter an           *
+ *    obstacle, return without doing anything.                                                 *
+ *                                                                                             *
+ * INPUT:   wall     -- The overlay type that is being placed down on the map.                 *
+ *                                                                                             *
+ *          house    -- The owner for newly placed wall segments                               *
+ *                                                                                             *
+ *          cell     -- The reference cell to check next to                                    *
+ *                                                                                             *
+ *          dir      -- The direction to step from the reference cell                          *
+ *                                                                                             *
+ *          step     -- The maximum number of steps to check for a connecting wall             *
+ *                                                                                             *
+ * OUTPUT:  Was the wall successfully extended?                                                *
+ *                                                                                             *
+ *                                                                                             *
+ * HISTORY:                                                                                    *
+ *   04/29/2020 pchote : Created for the "Modern Wall Building" mod.                           *
+ *=============================================================================================*/
+bool HouseClass::Extend_Wall(OverlayTypeClass const& wall, HousesType house, CELL cell, DirType dir, int step)
+{
+	// Step in the requested direction and abort if it is outside the map
+	CELL adjacent = Adjacent_Cell(cell, dir);
+	if (!Map.In_Radar(adjacent))
+		return false;
+
+	// Check whether the cell contains a connectable wall
+	OverlayType overlay = Map[adjacent].Overlay;
+	if (overlay == wall.Type)
+		return true;
+
+	// Cell is blocked by something else
+	if (!Map[adjacent].Is_Generally_Clear())
+		return false;
+
+	// Cell does not contain a connectable wall. Does the next?
+	if (step > 1 && Extend_Wall(wall, house, adjacent, dir, step - 1))
+	{
+		// The next cell does indeed have a wall
+		// Place our new connector and tell the caller that there is now a new connectable wall
+		if (wall.Create_And_Place(adjacent, house))
+		{
+			// Set the owner so players can sell line-built walls
+			// For some reason Create_And_Place does not do this for us
+			Map[adjacent].Owner = house;
+			return true;
+		}
+
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -4849,7 +4990,12 @@ void HouseClass::Sell_Wall(CELL cell)
 						Sound_Effect(VOC_CASHTURN);
 					}
 
-					Refund_Money(btype->Cost_Of()/2);
+					/*
+					** Kerekupai: modern wall building mod
+					** Disable refunds on walls to prevent cash exploits from line-built (free) walls.
+					** pchote - "Modern Wall Building" mod.
+					**/
+					// Refund_Money(btype->Cost_Of()/2);
 					Map[cell].Overlay = OVERLAY_NONE;
 					Map[cell].OverlayData = 0;
 					Map[cell].Owner = HOUSE_NONE;
@@ -5664,10 +5810,12 @@ int HouseClass::Expert_AI(void)
 		if (Control.MaxAircraft < (unsigned)maxaircraft + air_scale) {
 			Control.MaxAircraft = maxaircraft + air_scale;
 		}
+
 		/*
 		** Kerekupai: end of scale up building, unit, infantry limit
 		**			  original default value = 10
 		*/
+		
 	}
 
 	/*
@@ -5677,6 +5825,7 @@ int HouseClass::Expert_AI(void)
 	**	broke mode.
 	*/
 	if (State == STATE_ENDGAME) {
+		Do_Uncloak_All();
 		Fire_Sale();
 		Do_All_To_Hunt();
 	} else {
@@ -6040,7 +6189,7 @@ bool HouseClass::AI_Attack(UrgencyType )
 		UnitClass * u = Units.Ptr(index);
 
 		if (u != NULL && !u->IsInLimbo && u->House == this && u->Strength > 0) {
-			if(!shuffle && u->Is_Weapon_Equipped() && (forced || Percent_Chance(90))) {
+			if(!shuffle && u->Is_Weapon_Equipped() && (forced || Percent_Chance(70))) {
 				/*
 				** Kerekupai: set archive target to none to prevent units coming back to base from the assault
 				*/
@@ -6051,6 +6200,15 @@ bool HouseClass::AI_Attack(UrgencyType )
 				u->Assign_Mission(MISSION_HUNT);
 			}
 			else {
+
+				/*
+				** Kerekupai: if there is no mission, then assign the unit to guard area
+				*/
+				if (u->Mission == MISSION_NONE || u->Mission == MISSION_STICKY || u->Mission == MISSION_SLEEP || u->Mission == MISSION_GUARD)
+					u->Assign_Mission(MISSION_GUARD_AREA);
+				/*
+				** Kerekupai: end of if there is no mission, then assign the unit to guard area
+				*/
 
 				/*
 				**	If this unit is guarding the base, then cause it to shuffle
@@ -6082,7 +6240,8 @@ bool HouseClass::AI_Attack(UrgencyType )
 		InfantryClass * i = Infantry.Ptr(index);
 
 		if (i != NULL && !i->IsInLimbo && i->House == this && i->Strength > 0) {
-			if (!shuffle && (i->Is_Weapon_Equipped() || *i == INFANTRY_RENOVATOR) && (forced || Percent_Chance(75))) {
+			
+			if (!shuffle && (i->Is_Weapon_Equipped() || *i == INFANTRY_RENOVATOR) && (forced || Percent_Chance(70))) {
 				/*
 				** Kerekupai: set archive target to none to prevent units coming back to base from the assault
 				*/
@@ -6092,38 +6251,69 @@ bool HouseClass::AI_Attack(UrgencyType )
 				*/
 				
 				i->Assign_Mission(MISSION_HUNT);
+				
+			}
+			else {
+
 				/*
 				** Kerekupai: AI engineers capture oil derricks
-				**			  The AI assings the engineer to a randomly selected structure from 
+				**			  The AI assings the engineer to a randomly selected structure from
 				**			  the available oil derricks
-				*/ 
-				int const N = 100;
+				*/
+
+				/*int const N = 100;
 				int list[N];
-				int n = 0;
-				if (*i == INFANTRY_RENOVATOR)	  // if this infantry is an engineer		 
+				int n = 0;*/
+
+				int value = 0;
+				int best = -1;
+				if (/*Percent_Chance(50) &&*/ (*i == INFANTRY_RENOVATOR || *i == INFANTRY_E7))	  // if this infantry is an engineer		 
 				{
 					for (int index = 0; index < Buildings.Count(); index++) {
 						BuildingClass * b = Buildings.Ptr(index);
 
-						if (b != NULL && *b == STRUCT_PUMP && !Is_Ally(b->House) &&
-							n < N) {
-							list[n] = index; // store the index value of the building
+						if (b != NULL && *b == STRUCT_PUMP && !Is_Ally(b->House) /*&& n < N*/)
+						{
+							/*list[n] = index; // store the index value of the building
 							n++;			 // update counter
+							*/
+
+							// target nearest oil derrick
+							int val = Distance(Center, b->Center_Coord());
+							if (value == 0 || val < value) {
+								value = val;
+								best = index;
+							}
 						}
+
 					}
 					// Randomly select among the available oil derricks and assing mission to the engineer
-					if (n > 0 && n <= N)
+					/*if (n > 0 && n <= N)
 					{
 						//i->Assign_Target(Buildings.Ptr(list[(rand() % n)])->As_Target());
 						i->Assign_Destination(Buildings.Ptr(list[(rand() % n)])->As_Target());
 						i->Assign_Mission(MISSION_CAPTURE);
+					}*/
+
+					// Select nearest oil derrick
+					if (best >= 0) {
+						i->Assign_Destination(Buildings.Ptr(best)->As_Target());
+						i->Assign_Mission(MISSION_CAPTURE);
 					}
+
 				}
 				/*
 				** Kerekupai: end of AI engineers capture oil derricks
-				*/ 
-			}
-			else {
+				*/
+
+				/*
+				** Kerekupai: if there is no mission, assign guard area
+				*/
+				if (i->Mission == MISSION_NONE || i->Mission == MISSION_STICKY || i->Mission == MISSION_SLEEP || i->Mission == MISSION_GUARD)
+					i->Assign_Mission(MISSION_GUARD_AREA);
+				/*
+				** Kerekupai: end of if there is no mission, assign guard area
+				*/
 
 				/*
 				**	If this soldier is guarding the base, then cause it to shuffle
@@ -6137,7 +6327,8 @@ bool HouseClass::AI_Attack(UrgencyType )
 			** Kerekupai: if the infantry is far away from home, then send it hunting
 			**			  this may affect those discovered from crates
 			*/
-			if ((i->Is_Weapon_Equipped() || *i == INFANTRY_RENOVATOR) && i->Mission != MISSION_HUNT && i->Mission != MISSION_CAPTURE) {
+			if ((i->Is_Weapon_Equipped() || *i == INFANTRY_RENOVATOR) && 
+				(i->Mission != MISSION_HUNT || i->MissionQueue != MISSION_HUNT) && (i->Mission != MISSION_CAPTURE || i->MissionQueue != MISSION_CAPTURE) && i->Mission != MISSION_MOVE) {
 				if (Distance(i->Coord, Center) >= 5 * Radius) {
 					i->Assign_Mission(MISSION_HUNT);
 				}
@@ -6149,6 +6340,7 @@ bool HouseClass::AI_Attack(UrgencyType )
 			/*
 			** Kerekupai: end of if the infantry is far away from home, then send it hunting
 			*/
+
 		}
 	}
 	Attack = Rule.AttackInterval * Random_Pick(TICKS_PER_MINUTE / 2, TICKS_PER_MINUTE * 2);
@@ -6634,30 +6826,47 @@ bool HouseClass::Do_Uncloak_All()
 	bool something_cloaked = false;
 
 	// infantry
-	for (int index = 0; index < Infantry.Count(); index++) {
-		InfantryClass * i = Infantry.Ptr(index);
-		if (i != NULL && i->Cloak == CLOAKED) {
-			i->Do_Uncloak();
+	//for (int index = 0; index < Infantry.Count(); index++) {
+	//	InfantryClass * i = Infantry.Ptr(index);
+		//i->Cloak = UNCLOAKED;
+		/*if (i != NULL && (HouseClass *)i->House == this && i->Cloak == CLOAKED) {
+			//((TechnoClass *)i)->IsCloakable = false;
+			i->Do_Shimmer();
 			something_cloaked = true;
-		}
-	}
+		}*/
+	//}
 	// Unit
-	for (int index = 0; index < Units.Count(); index++) {
-		UnitClass * u = Units.Ptr(index);
-		if (u != NULL && u->Cloak == CLOAKED) {
-			u->Do_Uncloak();
+	//for (int index = 0; index < Units.Count(); index++) {
+	//	UnitClass * u = Units.Ptr(index);
+	//	u->Cloak = UNCLOAKED;
+		/*if (u != NULL && (HouseClass *)u->House == this && u->Cloak == CLOAKED) {
+			//((TechnoClass *)u)->IsCloakable = false;
+			u->Do_Shimmer();
 			something_cloaked = true;
-		}
-	}
+		}*/
+	//}
 	// Buildings
 	for (int index = 0; index < Buildings.Count(); index++) {
 		BuildingClass * b = Buildings.Ptr(index);
-		if (b != NULL && b->Cloak == CLOAKED) {
-			b->Do_Uncloak();
+		//b->Cloak = UNCLOAKED;
+		if (b != NULL && (HouseClass *)b->House == this && b->Cloak == CLOAKED) {
+			((TechnoClass *)b)->IsCloakable = false;
+			//b->Do_Shimmer();
 			something_cloaked = true;
 		}
 	}
-	// We skip aircraft
+	// aircraft find landing spot
+	for (int index = 0; index < Aircraft.Count(); index++) {
+		AircraftClass * a = Aircraft.Ptr(index);
+		//a->Cloak = UNCLOAKED;
+		if (a != NULL && (HouseClass *)a->House == this && !a->Class->IsFixedWing) {
+			//((TechnoClass *)u)->IsCloakable = false;
+			a->Assign_Destination(a->Good_LZ());
+			a->Assign_Mission(MISSION_MOVE);
+			something_cloaked = true;
+		}
+	}
+
 	return something_cloaked;
 }
 
@@ -6758,7 +6967,7 @@ int HouseClass::AI_Building(void)
 			if (Can_Build(b, ActLike) && (money > b->Cost_Of() || hasincome)) {
 				choiceptr = BuildChoice.Alloc();
 				if (choiceptr != NULL) {
-					*choiceptr = BuildChoiceClass(BQuantity[STRUCT_REFINERY] > 0 ? URGENCY_HIGH : URGENCY_CRITICAL, b->Type);
+					*choiceptr = BuildChoiceClass(BQuantity[STRUCT_REFINERY] > 1 ? URGENCY_HIGH : URGENCY_CRITICAL, b->Type);
 				}
 			}
 		}
@@ -7740,6 +7949,17 @@ int HouseClass::AI_Infantry(void)
 							if (CurInfantry > 5) {
 								typetrack[count].Value = 1 - max(IQuantity[index], 0);
 							}
+							/*
+							** Kerekupai: create more engineers if there are capturable oil pumps around
+							*/
+							/*for (int index = 0; index < Buildings.Count(); index++) {
+								BuildingClass * b = Buildings.Ptr(index);
+								if(b != NULL && *b == STRUCT_PUMP && (b->Owner() == HOUSE_NEUTRAL || !Is_Ally(b->House)))
+									typetrack[count].Value = 1;
+							}*/
+							/*
+							** Kerekupai: end of create more engineers if there are capturable oil pumps around
+							*/
 							break;
 
 						/* Kerekupai: enable AI to build commando (not when easy)   */

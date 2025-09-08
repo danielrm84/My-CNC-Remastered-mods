@@ -554,6 +554,27 @@ ResultType InfantryClass::Take_Damage(int & damage, int distance, WarheadType wa
 		** Kerekupai: end of tell wounded engineers to do something! (as done for RA)
 		*/
 
+		/*
+		** Kerekupai: fireback the source 
+		*/
+		if (!House->IsHuman && source != NULL && Target_Legal(source->As_Target()) && !House->Is_Ally(source->House) && Is_Weapon_Equipped() &&
+			(source->What_Am_I() != RTTI_AIRCRAFT || *this == INFANTRY_E3) &&
+			Target_Legal(TarCom) && As_Object(TarCom)->Is_Techno() && //In_Range(source->As_Target()) &&
+			(!((TechnoClass *)As_Object(TarCom))->Is_Weapon_Equipped() ||
+			(*this != INFANTRY_E3 && As_Object(TarCom)->What_Am_I() == RTTI_UNIT && source->What_Am_I() == RTTI_INFANTRY))
+			)
+		{
+			Assign_Target(source->As_Target());
+		}
+		/*if (!House->IsHuman && source != NULL && *this == INFANTRY_E3 && source->What_Am_I() != RTTI_INFANTRY &&
+			Target_Legal(TarCom) && As_Object(TarCom) && As_Object(TarCom)->Is_Techno() &&
+			!((TechnoClass *)As_Object(TarCom))->Is_Weapon_Equipped())
+			Assign_Target(source->As_Target());*/
+		/*
+		** Kerekupai: end of fireback the source
+		*/
+
+
 #ifdef BOXING
 		if (IsBoxing) {
 			int addval = 0;
@@ -1545,20 +1566,20 @@ void InfantryClass::AI(void)
 				if (Lepton_To_Cell(Distance_Coord(Coord, b->Center_Coord())) <= 3)
 				{
 					// update the hospital healing state and heal the infantry up at given rate
-					b->update_healing_state(true);
+					//b->update_healing_state(true);
 					if (Frame % 50 == 0)
 					{
 						Strength += 1;
 						if (Strength >= Class_Of().MaxStrength)
 						{
 							Strength = Class_Of().MaxStrength;
-							b->update_healing_state(false);
+							//b->update_healing_state(false);
 						}
 					}
 				}
-				else {
+				/*else {
 					b->update_healing_state(false);
-				}
+				}*/
 			}
 
 		}

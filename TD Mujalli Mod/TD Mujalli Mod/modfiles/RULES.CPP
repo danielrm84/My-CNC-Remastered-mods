@@ -183,7 +183,7 @@ RulesClass::RulesClass(void)
 		WarRatio = 0x0019;
 		WarLimit = 3; // Kerekupai: default 2
 		BarracksRatio = 0x0028;
-		BarracksLimit = 3; // Kerekupai: default 2
+		BarracksLimit = 2; // Kerekupai: default 2
 		RefineryLimit = 4;
 		RefineryRatio = 0x0028;
 		AirstripRatio = 0x001E;

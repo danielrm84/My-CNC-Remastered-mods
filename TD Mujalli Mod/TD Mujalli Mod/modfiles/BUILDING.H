@@ -156,6 +156,19 @@ class BuildingClass : public TechnoClass
 		*/
 		TCountDownTimerClass PlacementDelay;
 
+		/*
+		** Kerekupai: CFE PATCH REDUX MOD RALLY POINT
+		*/
+		//cfehunter 7th June 2020. Took a lot of digging into the allocation
+		//but it looks like memory is initialised to zeros when allocated from the object pools.
+		//So even though this CELL doesn't exist in older saves, it should be zero initialised.
+		//NOTE: /!\ Stole 2 bytes from the save game padding /!\/
+		TARGET RallyPoint;
+		TARGET Target_For_Rally_Point() const;
+		/*
+		** Kerekupai: end CFE PATCH REDUX MOD RALLY POINT
+		*/
+
 		/*---------------------------------------------------------------------
 		**	Constructors, Destructors, and overloaded operators.
 		*/
@@ -295,9 +308,28 @@ class BuildingClass : public TechnoClass
 		*/
 		int Validate(void) const;
 
+		/*
+		** Kerekupai: CFE PATCH REDUX MOD RALLY POINT
+		*/
+		bool Can_Have_Rally_Point() const;
+		virtual void Set_Unselected_By_Player(HouseClass* player = nullptr) override;
+
+		bool Rally_Unit(TechnoClass& unit);
+		/*
+		** Kerekupai: end CFE PATCH REDUX MOD RALLY POINT
+		*/
+
 	private:
 		void  Drop_Debris(TARGET source = TARGET_NONE);
 		virtual BulletClass * Fire_At(TARGET target, int which);
+
+		/*
+		** Kerekupai: CFE PATCH MOD RALLY POINT
+		*/
+		void  Player_Set_Rally_Point(TARGET target);
+		/*
+		** Kerekupai: end CFE PATCH MOD RALLY POINT
+		*/
 
 		/*
 		** Some additional padding in case we need to add data to the class and maintain backwards compatibility for save/load

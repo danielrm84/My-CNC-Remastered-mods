@@ -567,12 +567,18 @@ bool FootClass::Basic_Path(void)
  *=============================================================================================*/
 int FootClass::Mission_Move(void)
 {
+	/*
+	** Kerekupai: attack move (initialization)
+	*/
+	if (!Target_Legal(NavCom) && MissionQueue == MISSION_NONE) {
+		attack_move = false;
+	}
+	/*
+	** Kerekupai: end of attack move (initialization)
+	*/
+
 	if (!Target_Legal(NavCom) && !IsDriving && MissionQueue == MISSION_NONE) {
 		Enter_Idle_Mode();
-		/*
-		** Kerekupai: attack move (initialization)
-		*/
-		attack_move = false;
 	}
 	if (!Target_Legal(TarCom) && !House->IsHuman) {
 		Target_Something_Nearby(THREAT_RANGE);
@@ -760,7 +766,7 @@ int FootClass::Mission_Hunt(void)
 				** Kerekupai: make sure rocket launcher tries to find targets in range
 				*/
 				if (What_Am_I() == RTTI_UNIT && *(UnitClass*)this == UNIT_MLRS) {
-					if ((Target_Legal(TarCom) && !In_Range(TarCom, 0))/* || !IsFiring*/) {
+					if (Target_Legal(TarCom) && !In_Range(TarCom)/* || !IsFiring*/) {
 						Approach_Target();
 					}
 				}
@@ -1116,7 +1122,7 @@ int FootClass::Mission_Guard_Area(void)
 					!Target_Legal(infantry->TarCom) &&
 					!Target_Legal(infantry->NavCom) &&
 					Distance(infantry) < 7 * CELL_LEPTON_W &&
-					(infantry->Mission == MISSION_GUARD || infantry->Mission == MISSION_GUARD_AREA)) {
+					(infantry->Mission == MISSION_GUARD || infantry->Mission == MISSION_GUARD_AREA || infantry->Mission == MISSION_NONE)) {
 
 					infantry->Assign_Mission(MISSION_ENTER);
 					infantry->ArchiveTarget = As_Target();
@@ -1162,6 +1168,7 @@ int FootClass::Mission_Guard_Area(void)
 	**	If it has, then race back to it.
 	*/
 	int maxrange = MAX(Weapon_Range(0), Weapon_Range(1))+0x0100;
+		
 	if (!Target_Legal(NavCom) && (Distance(ArchiveTarget) > maxrange || (!Target_Legal(TarCom) && Distance(ArchiveTarget) > 0x0200))) {
 		Assign_Target(TARGET_NONE);
 		Assign_Destination(ArchiveTarget);
@@ -1177,6 +1184,17 @@ int FootClass::Mission_Guard_Area(void)
 	} else {
 		Approach_Target();
 	}
+
+	/*
+	** Kerekupai: make the unit return to its spot if it has already run long way and the target is not in range
+	*/
+	if ((House->IsHuman || GameToPlay != GAME_NORMAL) && /*Target_Legal(NavCom) &&*/ Target_Legal(TarCom) && !In_Range(TarCom) && Distance(ArchiveTarget) > maxrange) {
+		Assign_Target(TARGET_NONE);
+		Assign_Destination(ArchiveTarget);
+	}
+	/*
+	** Kerekupai: end of make the unit return to its spot if it has already run long way and the target is not in range
+	*/
 
 	/*
 	** Kerekupai: transport vehicles load up infantry units (as for RA)

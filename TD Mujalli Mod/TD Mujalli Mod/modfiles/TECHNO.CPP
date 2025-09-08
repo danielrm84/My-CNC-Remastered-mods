@@ -535,6 +535,15 @@ TechnoClass::TechnoClass(void) :
 	** Kerekupai: end of unit gain veterancy
 	*/
 
+	/*
+	** Kerekupai: playing with friends?	variable initialization
+	*/
+	gaming_with_friends = false;
+	n_human_players = 0;
+	/*
+	** Kerekupai: end of playing with friends
+	*/
+
 	// Added for multiplayer changes. ST - 3/6/2019 11:34AM
 	IsDiscoveredByPlayerMask = 0;
 }
@@ -1164,10 +1173,32 @@ void TechnoClass::Draw_It(int x, int y, WindowNumberType window)
 	}
 
 	/*
+	** Kerekupai: playing with friends
+	**			  if there are more than one human player in the session,
+	**			  then always draw the icons
+	*/
+
+	HouseClass * house;
+
+	if (GameToPlay != GAME_NORMAL && n_human_players < 1)
+	{
+		for (HousesType index = HOUSE_FIRST; index < HOUSE_COUNT; index++) {
+			house = HouseClass::As_Pointer(index);
+			if (house && house->IsHuman) { n_human_players++; }
+		}
+	}
+	if (n_human_players > 1) { gaming_with_friends = true; }
+
+	/*
+	** Kerekupai: end of playing with friends
+	*/
+
+
+	/*
 	** Kerekupai: draw veterancy icon (lower right corner)
 	*/
 	selected = Is_Selected_By_Player();
-	if (veterancy_level > 1 && window == WINDOW_VIRTUAL && selected && (House->Is_Ally(PlayerPtr))) {
+	if (veterancy_level > 1 && window == WINDOW_VIRTUAL && ((selected && House->Is_Ally(PlayerPtr)) || gaming_with_friends)) {
 
 		int w = 2;
 		int h = 3;
@@ -1194,14 +1225,14 @@ void TechnoClass::Draw_It(int x, int y, WindowNumberType window)
 	/*
 	** Kerekupai: draw icon indicating the owner of the oil derrick
 	*/
-	if (selected && What_Am_I() == RTTI_BUILDING && *((BuildingClass *)this) == STRUCT_PUMP && window == WINDOW_VIRTUAL) {
+	if ((selected || gaming_with_friends) && What_Am_I() == RTTI_BUILDING && *((BuildingClass *)this) == STRUCT_PUMP && window == WINDOW_VIRTUAL) {
 		int w = 7;
 		int h = 10;
 		int iconx = x - width / 3; // origin, reference coordinate
 		int icony = y + width / 3;
 		int icon_shape = 1; // oil_derrick_neutral
 
-		if (Owner() != HOUSE_NEUTRAL && Owner() != HOUSE_NONE && !House->Is_Ally(PlayerPtr))
+		if (Owner() != HOUSE_NEUTRAL && /*Owner() != HOUSE_NONE &&*/ !House->Is_Ally(PlayerPtr) && (GameToPlay == GAME_NORMAL || Owner() >= HOUSE_MULTI1))
 			icon_shape = 2; // oil derrick enemy
 		if (House->Is_Ally(PlayerPtr))
 			icon_shape = 3; // oil_derrick_player
@@ -1216,7 +1247,7 @@ void TechnoClass::Draw_It(int x, int y, WindowNumberType window)
 	/*
 	** Kerekupai: draw icon indicating healing state of hospitals
 	*/
-	if (What_Am_I() == RTTI_BUILDING && *((BuildingClass *)this) == STRUCT_HOSPITAL && House->Is_Ally(PlayerPtr) &&
+	if (What_Am_I() == RTTI_BUILDING && *((BuildingClass *)this) == STRUCT_HOSPITAL && (House->Is_Ally(PlayerPtr) || gaming_with_friends) &&
 		((BuildingClass *)this)->get_healing_state() == true && window == WINDOW_VIRTUAL) {
 		int w = 10;
 		int h = 10;
@@ -1229,6 +1260,25 @@ void TechnoClass::Draw_It(int x, int y, WindowNumberType window)
 	}
 	/*
 	** Kerekupai: end of draw icon indicating healing state of hospitals
+	*/
+
+	/*
+	** Kerekupai: draw guard mode icon (upper left corner)
+	*/
+	selected = Is_Selected_By_Player();
+	if (Mission == MISSION_GUARD_AREA && What_Am_I() != RTTI_BUILDING && window == WINDOW_VIRTUAL && ((selected && House->Is_Ally(PlayerPtr)) || gaming_with_friends)) {
+
+		int w = 5;
+		int h = 4;
+		int iconx = x + lx - (width / 2);// lx + 1; // origin, reference coordinate
+		int icony = y + ly + 1;
+		int icon_shape = 1;
+
+		// draw icon
+		DLL_Draw_Intercept(icon_shape, iconx, icony, w, h, SHAPE_WIN_REL | SHAPE_CENTER, this, "GUARDMODE", HOUSE_NONE, 0x100);
+	}
+	/*
+	** Kerekupai: end of draw guard mode icon
 	*/
 }
 
@@ -1461,7 +1511,7 @@ bool TechnoClass::Evaluate_Object(ThreatType method, int mask, int range, Techno
 	**			  isHuman flag added
 	*/
 	if (House->IsHuman && !Map[Coord_Cell(object->Center_Coord())].Is_Mapped(House) && 
-		!object->IsOwnedByPlayer && !object->IsDiscoveredByPlayer /*&& object->What_Am_I() != RTTI_AIRCRAFT*/) {
+		!object->IsOwnedByPlayer /*&& !object->IsDiscoveredByPlayer && object->What_Am_I() != RTTI_AIRCRAFT*/) {
 		return(false);
 	}
 	/*
@@ -1577,7 +1627,7 @@ bool TechnoClass::Evaluate_Object(ThreatType method, int mask, int range, Techno
 	**	a target boost value.
 	*/
 	if (object->House->Which_Zone(object) == ZONE_NONE) {
-		value *= 2;
+		value *= 3; // 2
 	}
 	/*
 	** Kerekupai: end from RA
@@ -1607,9 +1657,20 @@ bool TechnoClass::Evaluate_Object(ThreatType method, int mask, int range, Techno
 	/*
 	** Kerekupai: from RA
 	*/
+
+	/*
+	**	Adjust the target value upward if it is in the 'nervous zone' of the
+	**	owning base. This will tend to protect the base more thoroughly than
+	**	an unmodified scan would.
+	*/
+	if (House->Which_Zone(object) != ZONE_NONE) {
+		value *= 10;
+	}
+
 	/*
 	**	Lessen threat as a factor of distance.
 	*/
+	/*
 	if (value) {
 		//	if (rawval) {
 
@@ -1622,6 +1683,7 @@ bool TechnoClass::Evaluate_Object(ThreatType method, int mask, int range, Techno
 	}
 	value = 0;
 	return(false);
+	*/
 	/*
 	** Kerekupai: end of from RA
 	*/
@@ -1630,16 +1692,16 @@ bool TechnoClass::Evaluate_Object(ThreatType method, int mask, int range, Techno
 	**	Lessen threat as a factor of distance.
 	*/
 	
-	//if (range == -1 && value) {
+	if (range == -1 && value) {
 		/*
 		** Code from RA so that the value isn't always 2 on a mapwide scan with the range set to -1. ST - 3/2/2020 5:02PM
 		*/
-	//	value = (value * 32000) / ((dist/ICON_LEPTON_W)+1);
-	//} else {
+		value = (value * 32000) / ((dist/ICON_LEPTON_W)+1);
+	} else {
 		/*
 		** Original TD code
 		*/
-	/*	int modifier = dist;
+		int modifier = dist;
 		int crange = range / ICON_LEPTON_W;
 		if (crange) modifier /= crange;
 		if (modifier) value /= modifier;
@@ -1647,7 +1709,7 @@ bool TechnoClass::Evaluate_Object(ThreatType method, int mask, int range, Techno
 	if (rawval) {
 		value = MAX(value, 2);
 	}
-	return(true);*/
+	return(true);
 #endif
 }
 
@@ -2384,7 +2446,8 @@ void TechnoClass::Assign_Target(TARGET target)
 
 
 	if (GameToPlay != GAME_NORMAL && !House->IsHuman && !can_engage &&
-		obj != NULL && !obj->Class->IsBuildable && !obj->Class->IsFactory) {
+		obj != NULL && !obj->Class->IsBuildable && !obj->Class->IsFactory &&
+		obj->Owner() < HOUSE_MULTI1) { // >= 4 house_multi (see defines.h)
 		target = TARGET_NONE;
 	}
 	/*
@@ -2614,8 +2677,10 @@ BulletClass * TechnoClass::Fire_At(TARGET target, int which)
 				if ((!Is_Owned_By_Player(player) && !Is_Discovered_By_Player(player)) || !Map[Coord_Cell(Center_Coord())].Is_Mapped(House)) {
 					/*
 					** Kerekupai: dont reveal units hidden in the darkness
+					**			  with exceptions for some campaign scenarios
 					*/
-					//Map.Sight_From(player, Coord_Cell(Center_Coord()), 1, false);
+					if(Scenario == 61 && PlayerPtr->Class->House == HOUSE_BAD)
+						Map.Sight_From(player, Coord_Cell(Center_Coord()), 1, false);
 				}
 			}
 		}
@@ -3307,7 +3372,7 @@ void TechnoClass::Record_The_Kill(TechnoClass * source)
 	** Kerekupai: declare / define some variables
 	*/
 	
-	double factor = 0.2; // veterancy scaling factor
+	double factor = 0.13; // 0.2 veterancy scaling factor
 	short rn; // random number
 	int unit_cost = 0;
 	bool can_gain_veterancy = true;
@@ -3813,7 +3878,7 @@ void TechnoClass::Techno_Draw_Object(void const * shapefile, int shapenum, int x
 	if (shapefile) {
 		VisualType visual = Visual_Character();
 		void const * remap = Remap_Table();
-
+		
 		// Server still needs to "render" hidden objects to the virtual window, so objects get created properly - SKY
 		if ((visual == VISUAL_HIDDEN) && (window == WINDOW_VIRTUAL)) {
 			visual = VISUAL_SHADOWY;
@@ -4132,11 +4197,11 @@ void TechnoClass::Base_Is_Attacked(TechnoClass const *enemy)
 	*/
 
 	/*
-	** Kerekupai: units defend base defensive structures in skirmish only as done for RA
+	** Kerekupai: units defend base defensive structures in skirmish. Only occasionally in campaign (when basebuilding)
 	*/
-	//if (GameToPlay == GAME_NORMAL && Techno_Type_Class()->Primary != WEAPON_NONE) return;
+	if (GameToPlay == GAME_NORMAL && Techno_Type_Class()->Primary != WEAPON_NONE && !PlayerPtr->Can_Make_Money() /*(Random_Pick(0, 99) < 75)*/) return;
 	/*
-	** Kerekupai: end of units defend base defensive structures in skirmish as done for RA
+	** Kerekupai: end of units defend base defensive structures in skirmish. Only occasionally in campaign
 	*/
 
 	/*
@@ -4277,7 +4342,7 @@ void TechnoClass::Base_Is_Attacked(TechnoClass const *enemy)
 			**	the target.
 			*/
 			if (threat > 0 && ArchiveTarget == As_Target()) {
-				threat *= 10;
+				threat *= 100;
 			}
 			/*
 			** Kerekupai: end of increasing threat value
@@ -4355,7 +4420,11 @@ void TechnoClass::Base_Is_Attacked(TechnoClass const *enemy)
 	}
 
 	if (risktotal > desired) {
-		((FootClass *)enemy)->BaseAttackTimer.Set(15 * 15);
+		/*
+		** Kerekupai: timer set as done for RA
+		*/
+		((FootClass *)enemy)->BaseAttackTimer.Set(TICKS_PER_MINUTE * 0.25);
+		//((FootClass *)enemy)->BaseAttackTimer.Set(15 * 15); // original code
 	}
 }
 
@@ -4613,9 +4682,10 @@ bool TechnoClass::Target_Something_Nearby(ThreatType threat)
 	/*
 	** Kerekupai: units prioritize nearby targets
 	*/
-	bool target_found = false;
+	//bool target_found = false;
 	if (/*Mission == MISSION_HUNT*/ !House->IsHuman)
 	{
+		/*
 		if (What_Am_I() == RTTI_INFANTRY && (!Target_Legal(TarCom) || !In_Range(TarCom)))
 		{
 			if (*(InfantryClass *)this == INFANTRY_E3)
@@ -4630,25 +4700,32 @@ bool TechnoClass::Target_Something_Nearby(ThreatType threat)
 			else if (Is_Weapon_Equipped()) {
 				Assign_Target(Greatest_Threat(THREAT_RANGE | THREAT_INFANTRY));
 			}
-			if (!target_found && Target_Legal(TarCom) && In_Range(TarCom)) { target_found = true; }
+			//if (!target_found && Target_Legal(TarCom) && In_Range(TarCom)) { target_found = true; }
 		}
+		*/
 		/*
 		** Kerekupai: rocket launcher target priorities: range, infantry, buildings
 		*/
+		/*
 		if (What_Am_I() == RTTI_UNIT && *(UnitClass*)this == UNIT_MLRS) {
-			if (!Target_Legal(TarCom) || !In_Range(TarCom, 0)) {
+			if (!Target_Legal(TarCom) || !In_Range(TarCom)) {
 				Assign_Target(Greatest_Threat(THREAT_RANGE | THREAT_INFANTRY | THREAT_BUILDINGS));
-				if (!target_found && Target_Legal(TarCom) && In_Range(TarCom)) { target_found = true; }
+				//if (!target_found && Target_Legal(TarCom) && In_Range(TarCom)) { target_found = true; }
 			}
 		}
+		*/
 		/*
 		** Kerkeupai: end of rocket launcher target priorities: range, infantry, buildings
 		*/
-		if ((!Target_Legal(TarCom) || !In_Range(TarCom)) && !target_found) {
+		if ((!Target_Legal(TarCom) || !In_Range(TarCom)) /*&& !target_found*/) {
 			Assign_Target(Greatest_Threat(THREAT_RANGE));
-		} else {
-			if (!Target_Legal(TarCom) && Mission == MISSION_HUNT) {
+		}
+		if (Target_Legal(TarCom) && !In_Range(TarCom)) {
+			if (Mission == MISSION_HUNT) {
 				Assign_Target(Greatest_Threat(THREAT_NORMAL));
+			}
+			if (Mission == MISSION_GUARD_AREA) {
+				Assign_Target(Greatest_Threat(THREAT_RANGE | THREAT_AREA));
 			}
 		}
 	}		
